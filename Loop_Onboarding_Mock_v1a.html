@@ -30,6 +30,10 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);displa
 .logo-text{font-size:18px;font-weight:700;color:#fff;letter-spacing:-.5px;}
 .sb-nav{padding:12px;}
 .sb-lbl{font-size:10px;font-weight:600;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:1px;padding:8px 12px 4px;}
+.sb-section{border-radius:10px;padding:4px;margin-bottom:4px;transition:background .3s;}
+.sb-section.focus{background:rgba(25,110,130,.14);border:1px solid rgba(25,110,130,.22);}
+.sb-section.dim .sb-item,.sb-section.dim .sb-lbl{opacity:.35;pointer-events:none;}
+.sb-section.dim{border:1px solid transparent;}
 .sb-item{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;color:rgba(255,255,255,.45);font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;margin-bottom:1px;}
 .sb-item:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.8);}
 .sb-item.active{background:rgba(25,110,130,.28);color:var(--mint);}
@@ -48,10 +52,12 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);displa
 .sb-rag.red{background:#ef4444;}
 .sb-rag.amber{background:#f59e0b;}
 .sb-rag.green{background:#22c55e;}
-.sb-sub{display:flex;align-items:center;gap:8px;padding:5px 12px 5px 32px;border-radius:7px;color:rgba(255,255,255,.35);font-size:12px;cursor:pointer;transition:all .15s;margin-bottom:1px;}
+.sb-sub{display:flex;align-items:center;gap:8px;padding:5px 12px 5px 32px;border-radius:7px;color:rgba(255,255,255,.35);font-size:12px;cursor:pointer;transition:all .15s;margin-bottom:1px;overflow:hidden;max-height:32px;opacity:1;}
+.sb-sub.collapsed{max-height:0;opacity:0;pointer-events:none;margin:0;padding-top:0;padding-bottom:0;}
 .sb-sub:hover{background:rgba(255,255,255,.05);color:rgba(255,255,255,.7);}
 .sb-sub.active{color:var(--mint);font-weight:500;}
 .sb-sub .sb-rag{margin-left:auto;}
+#sb-plat-subs{transition:all .3s ease;overflow:hidden;}
 .sb-foot{margin-top:auto;padding:14px 12px;border-top:1px solid rgba(255,255,255,.08);}
 .sb-user{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;cursor:pointer;transition:all .15s;}
 .sb-user:hover{background:rgba(255,255,255,.08);}
@@ -277,17 +283,19 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);displa
 .buddy-msg.user{background:var(--navy);color:#fff;border-radius:10px 10px 3px 10px;align-self:flex-end;}
 .buddy-stage{display:flex;align-items:center;gap:6px;padding:6px 0 2px;font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;}
 .buddy-stage::before,.buddy-stage::after{content:'';flex:1;height:1px;background:var(--border);}
-.buddy-replies{padding:0 12px 8px;display:flex;flex-wrap:wrap;gap:5px;}
+.buddy-replies-wrap{border-top:1px solid var(--border);padding:8px 12px 10px;}
+.buddy-replies-lbl{font-size:9px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px;}
+.buddy-replies{display:flex;flex-wrap:wrap;gap:5px;}
 .buddy-reply{padding:5px 10px;border-radius:16px;background:var(--bg);border:1px solid var(--border);font-size:10px;font-weight:500;color:var(--text);cursor:pointer;transition:all .15s;font-family:inherit;}
 .buddy-reply:hover{border-color:var(--teal);color:var(--teal);background:rgba(25,110,130,.04);}
-.buddy-inp{padding:10px 12px;border-top:1px solid var(--border);display:flex;gap:6px;}
-.buddy-inp input{flex:1;padding:8px 10px;border-radius:8px;border:1px solid var(--border);font-family:inherit;font-size:11px;outline:none;transition:border .15s;}
-.buddy-inp input:focus{border-color:var(--teal);}
-.buddy-inp button{width:30px;height:30px;border-radius:8px;background:var(--teal);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.buddy-inp{padding:10px 12px;border-top:1px solid var(--border);display:flex;gap:6px;align-items:flex-end;}
+.buddy-inp textarea{flex:1;padding:8px 10px;border-radius:8px;border:1px solid var(--border);font-family:inherit;font-size:11px;outline:none;transition:border .15s;resize:none;height:60px;line-height:1.5;}
+.buddy-inp textarea:focus{border-color:var(--teal);}
+.buddy-inp button{width:30px;height:30px;border-radius:8px;background:var(--teal);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;align-self:flex-end;}
 .buddy-inp button:hover{background:var(--navy);}
 .buddy-inp button .material-icons{font-size:16px;}
 /* SoS section */
-.sos-section{padding:10px 12px;background:rgba(9,35,75,.02);border-top:1px solid var(--border);}
+.sos-section{padding:10px 12px 14px;background:rgba(9,35,75,.02);border-top:1px solid var(--border);}
 .sos-lbl{font-size:9px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;}
 .sos-btns{display:flex;flex-direction:column;gap:4px;}
 .sos-btn{display:flex;align-items:center;gap:7px;padding:7px 10px;border-radius:7px;border:1px solid var(--border);background:#fff;font-family:inherit;font-size:11px;font-weight:500;cursor:pointer;color:var(--sub);text-decoration:none;transition:all .15s;}
@@ -347,47 +355,51 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);displa
     <div class="logo-text">Loop</div>
   </div>
   <div class="sb-nav">
-    <div class="sb-lbl">Onboarding</div>
-    <div class="sb-item" id="sb1" onclick="navClick('welcome')">
-      <span class="material-icons">waving_hand</span> Welcome
-      <span class="sb-rag green" id="rag1"></span>
-    </div>
-    <div class="sb-item" id="sb2" onclick="navClick('platforms')">
-      <span class="material-icons">storefront</span> Connect Platforms
-      <span class="sb-rag red" id="rag2"></span>
-    </div>
-    <!-- Platform sub-nav -->
-    <div id="sb-plat-subs">
-      <div class="sb-sub" id="sbp-dd" onclick="navToPlat('dd')">
-        <span style="font-size:11px;">↳</span> DoorDash
-        <span class="sb-rag red" id="ragdd"></span>
+    <div class="sb-section focus" id="sb-onboarding-section">
+      <div class="sb-lbl">Onboarding</div>
+      <div class="sb-item" id="sb1" onclick="navClick('welcome')">
+        <span class="material-icons">waving_hand</span> Welcome
+        <span class="sb-rag green" id="rag1"></span>
       </div>
-      <div class="sb-sub" id="sbp-ue" onclick="navToPlat('ue')">
-        <span style="font-size:11px;">↳</span> Uber Eats
-        <span class="sb-rag red" id="rague"></span>
+      <div class="sb-item" id="sb2" onclick="navClick('platforms')">
+        <span class="material-icons">storefront</span> Connect Platforms
+        <span class="sb-rag red" id="rag2"></span>
       </div>
-      <div class="sb-sub" id="sbp-gh" onclick="navToPlat('gh')">
-        <span style="font-size:11px;">↳</span> GrubHub
-        <span class="sb-rag red" id="raggh"></span>
+      <!-- Platform sub-nav: collapsed by default, expanded on platforms/platflow -->
+      <div id="sb-plat-subs">
+        <div class="sb-sub collapsed" id="sbp-dd" onclick="navToPlat('dd')">
+          <span style="font-size:11px;">↳</span> DoorDash
+          <span class="sb-rag red" id="ragdd"></span>
+        </div>
+        <div class="sb-sub collapsed" id="sbp-ue" onclick="navToPlat('ue')">
+          <span style="font-size:11px;">↳</span> Uber Eats
+          <span class="sb-rag red" id="rague"></span>
+        </div>
+        <div class="sb-sub collapsed" id="sbp-gh" onclick="navToPlat('gh')">
+          <span style="font-size:11px;">↳</span> GrubHub
+          <span class="sb-rag red" id="raggh"></span>
+        </div>
+      </div>
+      <div class="sb-item" id="sb3" onclick="navClick('stores')">
+        <span class="material-icons">location_on</span> Verify Stores
+        <span class="sb-rag red" id="rag3"></span>
+      </div>
+      <div class="sb-item" id="sb4" onclick="navClick('done')">
+        <span class="material-icons">check_circle</span> Go Live
+        <span class="sb-rag red" id="rag4"></span>
       </div>
     </div>
-    <div class="sb-item" id="sb3" onclick="navClick('stores')">
-      <span class="material-icons">location_on</span> Verify Stores
-      <span class="sb-rag red" id="rag3"></span>
-    </div>
-    <div class="sb-item" id="sb4" onclick="navClick('done')">
-      <span class="material-icons">check_circle</span> Go Live
-      <span class="sb-rag red" id="rag4"></span>
-    </div>
-    <div class="sb-lbl" style="margin-top:8px;">Navigation</div>
-    <div class="sb-item" onclick="toast('info','Dashboard','Available after onboarding is complete.','dashboard')">
-      <span class="material-icons">dashboard</span> Dashboard
-    </div>
-    <div class="sb-item" onclick="toast('info','Analytics','Available after onboarding is complete.','bar_chart')">
-      <span class="material-icons">bar_chart</span> Analytics
-    </div>
-    <div class="sb-item" onclick="toast('info','Settings','Available after onboarding is complete.','settings')">
-      <span class="material-icons">settings</span> Settings
+    <div class="sb-section dim" id="sb-nav-section">
+      <div class="sb-lbl">Navigation</div>
+      <div class="sb-item">
+        <span class="material-icons">dashboard</span> Dashboard
+      </div>
+      <div class="sb-item">
+        <span class="material-icons">bar_chart</span> Analytics
+      </div>
+      <div class="sb-item">
+        <span class="material-icons">settings</span> Settings
+      </div>
     </div>
   </div>
   <div class="sb-foot">
@@ -428,20 +440,20 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);displa
     <div id="s-welcome" class="screen" style="max-width:680px;margin:0 auto;">
       <div class="w-tag"><span class="material-icons">rocket_launch</span> Setup Wizard</div>
       <h1 class="w-h1">Welcome to Loop,<br><span>let's get you live fast.</span></h1>
-      <p class="w-sub">You're just a few steps away from having full visibility and control over your 3rd-party delivery platforms. We'll connect DoorDash, Uber Eats, and GrubHub in parallel — allow about 20 minutes to be safe.</p>
+      <p class="w-sub">You are just a few steps away from having full visibility and control over your third-party delivery platforms. We will connect DoorDash, Uber Eats, and GrubHub in parallel — please allow about 20 minutes to complete this setup.</p>
       <div class="card" style="padding:22px;margin-bottom:16px;">
         <div class="section-head">What to expect</div>
         <div class="expect-item">
           <div class="exp-icon t"><span class="material-icons">link</span></div>
-          <div class="exp-txt"><h4>Connect 3 platforms simultaneously</h4><p>No waiting — DoorDash, Uber Eats & GrubHub all run in parallel. We guide you through each one step by step.</p></div>
+          <div class="exp-txt"><h4>Connect 3 platforms simultaneously</h4><p>No waiting — DoorDash, Uber Eats &amp; GrubHub all run in parallel. We will guide you through each one, step by step.</p></div>
         </div>
         <div class="expect-item">
           <div class="exp-icon g"><span class="material-icons">verified</span></div>
-          <div class="exp-txt"><h4>Automatic store & menu discovery</h4><p>Once access is granted, Loop automatically pulls all your locations and menus. Nothing manual.</p></div>
+          <div class="exp-txt"><h4>Automatic store &amp; menu discovery</h4><p>Once access is granted, Loop will automatically pull all your locations and menus. No manual work needed.</p></div>
         </div>
         <div class="expect-item" style="margin-bottom:0;">
           <div class="exp-icon a"><span class="material-icons">bolt</span></div>
-          <div class="exp-txt"><h4>You'll need: Platform admin credentials</h4><p>Have access to your DoorDash, Uber Eats, and GrubHub merchant portals. A Business Admin or Manager role is required.</p></div>
+          <div class="exp-txt"><h4>What you will need: platform admin credentials</h4><p>Make sure you have access to your DoorDash, Uber Eats, and GrubHub merchant portals. A Business Admin or Manager role is required on each platform.</p></div>
         </div>
       </div>
       <div class="card" style="padding:22px;margin-bottom:24px;">
@@ -475,7 +487,7 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);displa
       </div>
       <div class="parallel-tip">
         <span class="material-icons">tips_and_updates</span>
-        <p><strong>Pro tip:</strong> Open each platform in a separate browser tab so you can work on all three at once. The steps take 2–4 minutes each, and most of the wait is just verification — no active work needed.</p>
+        <p><strong>Pro tip:</strong> Open each platform in a separate browser tab so you can work on all three at once. Each platform takes 2–4 minutes, and most of the wait is automated verification — no active work needed from you.</p>
       </div>
       <div class="plat-grid">
         <!-- DoorDash card -->
@@ -516,7 +528,7 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);displa
         </div>
       </div>
       <div style="background:var(--bg);border-radius:10px;padding:14px 18px;font-size:12px;color:var(--sub);line-height:1.6;">
-        <strong style="color:var(--text);">Having trouble?</strong> Make sure you're logged in as an admin on each platform before starting. If someone else manages your portals, use the <strong>Invite Teammate</strong> button in the sidebar to bring them in.
+        <strong style="color:var(--text);">Having trouble?</strong> Make sure you are logged in as an admin on each platform before you begin. If someone else manages your portals, use the <strong>Invite Teammate</strong> button in the sidebar to bring them in.
       </div>
     </div>
 
@@ -623,9 +635,12 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);displa
     </div>
   </div>
   <div class="buddy-msgs" id="bmsgs"></div>
-  <div class="buddy-replies" id="breplies"></div>
+  <div class="buddy-replies-wrap" id="breplies-wrap" style="display:none;">
+    <div class="buddy-replies-lbl">Suggested questions</div>
+    <div class="buddy-replies" id="breplies"></div>
+  </div>
   <div class="buddy-inp">
-    <input id="binp" type="text" placeholder="Ask Buddy anything..." onkeydown="if(event.key==='Enter')sendB()">
+    <textarea id="binp" placeholder="Ask Buddy anything..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendB();}"></textarea>
     <button onclick="sendB()"><span class="material-icons">send</span></button>
   </div>
   <div class="sos-section">
@@ -890,10 +905,13 @@ function updateSidebar(screen) {
     const isPlat = screen==='platflow' && i===1;
     el.className='sb-item'+((i+1===cur||isPlat)?' active':'');
   });
-  // Platform sub-items active state
+  // Platform sub-items: show on platforms or platflow, hide otherwise
+  const showSubs = (screen==='platforms'||screen==='platflow');
   ['dd','ue','gh'].forEach(p=>{
     const el=document.getElementById('sbp-'+p);
-    if(el) el.className='sb-sub'+(screen==='platflow'&&S.platflow===p?' active':'');
+    if(!el) return;
+    const isActive = screen==='platflow'&&S.platflow===p;
+    el.className='sb-sub'+(isActive?' active':'')+(showSubs?'':' collapsed');
   });
   // RAG indicators
   // Step 1 (Welcome): always green once visited
@@ -1305,7 +1323,10 @@ function bStage(label) {
 }
 
 function renderReplies(replies) {
+  const wrap = document.getElementById('breplies-wrap');
   const el = document.getElementById('breplies');
+  if(!replies || replies.length===0){wrap.style.display='none';el.innerHTML='';return;}
+  wrap.style.display='block';
   el.innerHTML = replies.map(r => `<button class="buddy-reply" onclick="handleReply(this,'${r.replace(/'/g,"\\'")}')">${r}</button>`).join('');
 }
 
@@ -1345,6 +1366,7 @@ function sendB() {
     bAdd(ans);
   }, 500);
 }
+
 
 // ═══ TOAST ═══
 function toast(type, title, msg, icon='info') {
