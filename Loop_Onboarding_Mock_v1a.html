@@ -44,6 +44,14 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);displa
 .st-dot{width:20px;height:20px;border-radius:50%;border:1.5px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;}
 .st-step.active .st-dot{border-color:var(--teal);background:var(--teal);color:#fff;}
 .st-step.done .st-dot{border-color:var(--mint);background:rgba(132,225,204,.2);color:var(--mint);}
+.sb-rag{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-left:auto;}
+.sb-rag.red{background:#ef4444;}
+.sb-rag.amber{background:#f59e0b;}
+.sb-rag.green{background:#22c55e;}
+.sb-sub{display:flex;align-items:center;gap:8px;padding:5px 12px 5px 32px;border-radius:7px;color:rgba(255,255,255,.35);font-size:12px;cursor:pointer;transition:all .15s;margin-bottom:1px;}
+.sb-sub:hover{background:rgba(255,255,255,.05);color:rgba(255,255,255,.7);}
+.sb-sub.active{color:var(--mint);font-weight:500;}
+.sb-sub .sb-rag{margin-left:auto;}
 .sb-foot{margin-top:auto;padding:14px 12px;border-top:1px solid rgba(255,255,255,.08);}
 .sb-user{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;cursor:pointer;transition:all .15s;}
 .sb-user:hover{background:rgba(255,255,255,.08);}
@@ -54,7 +62,7 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);displa
 .invite-hint .material-icons{font-size:11px;}
 
 /* MAIN */
-.main{margin-left:240px;flex:1;display:flex;flex-direction:column;min-height:100vh;margin-right:340px;}
+.main{margin-left:240px;flex:1;display:flex;flex-direction:column;min-height:100vh;margin-right:272px;}
 
 /* TOPBAR */
 .topbar{background:#fff;border-bottom:1px solid var(--border);padding:14px 28px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:40;}
@@ -248,7 +256,7 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);displa
 .done-ring .material-icons{font-size:40px;color:#fff;}
 
 /* NAV ACTION BAR */
-.nav-bar{position:fixed;bottom:0;left:240px;right:340px;background:#fff;border-top:1px solid var(--border);padding:14px 32px;display:flex;align-items:center;justify-content:space-between;z-index:40;}
+.nav-bar{position:fixed;bottom:0;left:240px;right:272px;background:#fff;border-top:1px solid var(--border);padding:14px 32px;display:flex;align-items:center;justify-content:space-between;z-index:40;}
 .nav-btn{display:flex;align-items:center;gap:6px;padding:10px 22px;border-radius:8px;border:none;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;}
 .nav-btn.back{background:var(--bg);color:var(--sub);border:1px solid var(--border);}
 .nav-btn.back:hover{color:var(--text);}
@@ -258,36 +266,36 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);displa
 .nav-btn .material-icons{font-size:16px;}
 
 /* BUDDY PANEL */
-.buddy{position:fixed;top:0;right:0;bottom:0;width:340px;background:#fff;border-left:1px solid var(--border);display:flex;flex-direction:column;z-index:45;}
-.buddy-head{padding:16px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
-.buddy-ava{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--mint));display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff;flex-shrink:0;}
-.buddy-name{font-size:14px;font-weight:700;}
-.buddy-status{font-size:11px;color:var(--green);display:flex;align-items:center;gap:4px;}
-.buddy-status::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block;}
-.buddy-msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;}
-.buddy-msg{background:var(--bg);border-radius:12px 12px 12px 4px;padding:10px 14px;font-size:12px;line-height:1.6;color:var(--text);max-width:85%;animation:fadeUp .2s ease;}
-.buddy-msg.user{background:var(--navy);color:#fff;border-radius:12px 12px 4px 12px;align-self:flex-end;}
-.buddy-replies{padding:0 16px 8px;display:flex;flex-wrap:wrap;gap:6px;}
-.buddy-reply{padding:6px 12px;border-radius:20px;background:var(--bg);border:1px solid var(--border);font-size:11px;font-weight:500;color:var(--text);cursor:pointer;transition:all .15s;font-family:inherit;}
+.buddy{position:fixed;top:0;right:0;bottom:0;width:272px;background:#fff;border-left:1px solid var(--border);display:flex;flex-direction:column;z-index:45;}
+.buddy-head{padding:12px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+.buddy-ava{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--mint));display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0;}
+.buddy-name{font-size:13px;font-weight:700;}
+.buddy-status{font-size:10px;color:var(--green);display:flex;align-items:center;gap:4px;}
+.buddy-status::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--green);display:inline-block;}
+.buddy-msgs{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;}
+.buddy-msg{background:var(--bg);border-radius:10px 10px 10px 3px;padding:8px 12px;font-size:11px;line-height:1.6;color:var(--text);max-width:90%;animation:fadeUp .2s ease;}
+.buddy-msg.user{background:var(--navy);color:#fff;border-radius:10px 10px 3px 10px;align-self:flex-end;}
+.buddy-stage{display:flex;align-items:center;gap:6px;padding:6px 0 2px;font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;}
+.buddy-stage::before,.buddy-stage::after{content:'';flex:1;height:1px;background:var(--border);}
+.buddy-replies{padding:0 12px 8px;display:flex;flex-wrap:wrap;gap:5px;}
+.buddy-reply{padding:5px 10px;border-radius:16px;background:var(--bg);border:1px solid var(--border);font-size:10px;font-weight:500;color:var(--text);cursor:pointer;transition:all .15s;font-family:inherit;}
 .buddy-reply:hover{border-color:var(--teal);color:var(--teal);background:rgba(25,110,130,.04);}
-
-/* SoS section */
-.sos-section{padding:12px 16px;background:rgba(9,35,75,.03);border-top:1px solid var(--border);}
-.sos-lbl{font-size:10px;font-weight:600;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;}
-.sos-btns{display:flex;flex-direction:column;gap:6px;}
-.sos-btn{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:8px;border:1.5px solid var(--border);background:#fff;font-family:inherit;font-size:12px;font-weight:500;cursor:pointer;color:var(--text);text-decoration:none;transition:all .15s;}
-.sos-btn:hover{border-color:var(--teal);color:var(--teal);background:rgba(25,110,130,.03);}
-.sos-btn .material-icons{font-size:16px;color:var(--teal);}
-
-.buddy-inp{padding:12px 16px;border-top:1px solid var(--border);display:flex;gap:8px;}
-.buddy-inp input{flex:1;padding:9px 12px;border-radius:8px;border:1px solid var(--border);font-family:inherit;font-size:12px;outline:none;transition:border .15s;}
+.buddy-inp{padding:10px 12px;border-top:1px solid var(--border);display:flex;gap:6px;}
+.buddy-inp input{flex:1;padding:8px 10px;border-radius:8px;border:1px solid var(--border);font-family:inherit;font-size:11px;outline:none;transition:border .15s;}
 .buddy-inp input:focus{border-color:var(--teal);}
-.buddy-inp button{width:34px;height:34px;border-radius:8px;background:var(--teal);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.buddy-inp button{width:30px;height:30px;border-radius:8px;background:var(--teal);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .buddy-inp button:hover{background:var(--navy);}
-.buddy-inp button .material-icons{font-size:18px;}
+.buddy-inp button .material-icons{font-size:16px;}
+/* SoS section */
+.sos-section{padding:10px 12px;background:rgba(9,35,75,.02);border-top:1px solid var(--border);}
+.sos-lbl{font-size:9px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;}
+.sos-btns{display:flex;flex-direction:column;gap:4px;}
+.sos-btn{display:flex;align-items:center;gap:7px;padding:7px 10px;border-radius:7px;border:1px solid var(--border);background:#fff;font-family:inherit;font-size:11px;font-weight:500;cursor:pointer;color:var(--sub);text-decoration:none;transition:all .15s;}
+.sos-btn:hover{border-color:var(--teal);color:var(--teal);background:rgba(25,110,130,.03);}
+.sos-btn .material-icons{font-size:14px;color:var(--teal);}
 
 /* TOASTS */
-#toasts{position:fixed;top:18px;right:360px;z-index:9999;display:flex;flex-direction:column;gap:8px;}
+#toasts{position:fixed;top:18px;right:288px;z-index:9999;display:flex;flex-direction:column;gap:8px;}
 .toast{display:flex;align-items:flex-start;gap:10px;padding:12px 16px;border-radius:10px;background:#fff;box-shadow:var(--shl);border:1px solid var(--border);min-width:260px;max-width:340px;animation:slideIn .3s ease;}
 @keyframes slideIn{from{opacity:0;transform:translateX(20px);}to{opacity:1;transform:translateX(0);}}
 .toast.success{border-left:4px solid var(--green);}
@@ -340,17 +348,36 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);displa
   </div>
   <div class="sb-nav">
     <div class="sb-lbl">Onboarding</div>
-    <div class="sb-item active" id="sb1" onclick="navClick('welcome')">
+    <div class="sb-item" id="sb1" onclick="navClick('welcome')">
       <span class="material-icons">waving_hand</span> Welcome
+      <span class="sb-rag green" id="rag1"></span>
     </div>
     <div class="sb-item" id="sb2" onclick="navClick('platforms')">
       <span class="material-icons">storefront</span> Connect Platforms
+      <span class="sb-rag red" id="rag2"></span>
+    </div>
+    <!-- Platform sub-nav -->
+    <div id="sb-plat-subs">
+      <div class="sb-sub" id="sbp-dd" onclick="navToPlat('dd')">
+        <span style="font-size:11px;">↳</span> DoorDash
+        <span class="sb-rag red" id="ragdd"></span>
+      </div>
+      <div class="sb-sub" id="sbp-ue" onclick="navToPlat('ue')">
+        <span style="font-size:11px;">↳</span> Uber Eats
+        <span class="sb-rag red" id="rague"></span>
+      </div>
+      <div class="sb-sub" id="sbp-gh" onclick="navToPlat('gh')">
+        <span style="font-size:11px;">↳</span> GrubHub
+        <span class="sb-rag red" id="raggh"></span>
+      </div>
     </div>
     <div class="sb-item" id="sb3" onclick="navClick('stores')">
       <span class="material-icons">location_on</span> Verify Stores
+      <span class="sb-rag red" id="rag3"></span>
     </div>
     <div class="sb-item" id="sb4" onclick="navClick('done')">
       <span class="material-icons">check_circle</span> Go Live
+      <span class="sb-rag red" id="rag4"></span>
     </div>
     <div class="sb-lbl" style="margin-top:8px;">Navigation</div>
     <div class="sb-item" onclick="toast('info','Dashboard','Available after onboarding is complete.','dashboard')">
@@ -362,13 +389,6 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);displa
     <div class="sb-item" onclick="toast('info','Settings','Available after onboarding is complete.','settings')">
       <span class="material-icons">settings</span> Settings
     </div>
-  </div>
-  <div class="sb-tracker">
-    <div class="sb-tracker-lbl"><span class="material-icons">timeline</span> Your Progress</div>
-    <div class="st-step done" id="sbt1" onclick="go('welcome')"><div class="st-dot">✓</div><span>Welcome</span></div>
-    <div class="st-step" id="sbt2" onclick="go('platforms')"><div class="st-dot">2</div><span>Connect Platforms</span></div>
-    <div class="st-step" id="sbt3" onclick="go('stores')"><div class="st-dot">3</div><span>Verify Stores</span></div>
-    <div class="st-step" id="sbt4" onclick="go('done')"><div class="st-dot">4</div><span>Go Live</span></div>
   </div>
   <div class="sb-foot">
     <div class="sb-user" onclick="openInviteModal()">
@@ -408,7 +428,7 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);displa
     <div id="s-welcome" class="screen" style="max-width:680px;margin:0 auto;">
       <div class="w-tag"><span class="material-icons">rocket_launch</span> Setup Wizard</div>
       <h1 class="w-h1">Welcome to Loop,<br><span>let's get you live fast.</span></h1>
-      <p class="w-sub">You're just a few steps away from having full visibility and control over your 3rd-party delivery platforms. We'll connect DoorDash, Uber Eats, and GrubHub in parallel — most teams finish in under 12 minutes.</p>
+      <p class="w-sub">You're just a few steps away from having full visibility and control over your 3rd-party delivery platforms. We'll connect DoorDash, Uber Eats, and GrubHub in parallel — allow about 20 minutes to be safe.</p>
       <div class="card" style="padding:22px;margin-bottom:16px;">
         <div class="section-head">What to expect</div>
         <div class="expect-item">
@@ -428,19 +448,19 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);displa
         <div class="section-head">Estimated time</div>
         <div class="time-bar">
           <div class="tb-seg" style="background:rgba(255,48,8,.06);border-color:rgba(255,48,8,.2);flex:1;">
-            <div class="num" style="color:var(--dd);">~3 min</div>
+            <div class="num" style="color:var(--dd);">~6 min</div>
             <div class="lbl">DoorDash</div>
           </div>
           <div class="tb-seg" style="background:rgba(6,193,103,.06);border-color:rgba(6,193,103,.2);flex:1;">
-            <div class="num" style="color:var(--ue);">~4 min</div>
+            <div class="num" style="color:var(--ue);">~8 min</div>
             <div class="lbl">Uber Eats</div>
           </div>
           <div class="tb-seg" style="background:rgba(246,52,64,.06);border-color:rgba(246,52,64,.2);flex:1;">
-            <div class="num" style="color:var(--gh);">~3 min</div>
+            <div class="num" style="color:var(--gh);">~6 min</div>
             <div class="lbl">GrubHub</div>
           </div>
           <div class="tb-seg total" style="flex:1.2;">
-            <div class="num" style="color:#1d4ed8;">~12 min</div>
+            <div class="num" style="color:#1d4ed8;">~20 min</div>
             <div class="lbl">Total (parallel)</div>
           </div>
         </div>
@@ -604,6 +624,10 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);displa
   </div>
   <div class="buddy-msgs" id="bmsgs"></div>
   <div class="buddy-replies" id="breplies"></div>
+  <div class="buddy-inp">
+    <input id="binp" type="text" placeholder="Ask Buddy anything..." onkeydown="if(event.key==='Enter')sendB()">
+    <button onclick="sendB()"><span class="material-icons">send</span></button>
+  </div>
   <div class="sos-section">
     <div class="sos-lbl">Need more help?</div>
     <div class="sos-btns">
@@ -614,10 +638,6 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);displa
         <span class="material-icons">mail</span> Email support@tryloop.ai
       </a>
     </div>
-  </div>
-  <div class="buddy-inp">
-    <input id="binp" type="text" placeholder="Ask Buddy anything..." onkeydown="if(event.key==='Enter')sendB()">
-    <button onclick="sendB()"><span class="material-icons">send</span></button>
   </div>
 </div>
 
@@ -685,7 +705,7 @@ const PLAT = {
     id:'ue', name:'Uber Eats', cls:'ue', color:'#06C167',
     email:'loop_sso_2@restaurantoperations.tech',
     role:'Manager',
-    portalUrl:'https://merchants.ubereats.com',
+    portalUrl:'https://merchants.ubereats.com/manager/en-US/access/users',
     portalName:'Uber Eats Restaurant Manager',
     portalNav:'Users → select each store from dropdown → Add User',
     stores: 8,
@@ -782,10 +802,10 @@ const BUDDY_ANSWERS = {
 const SCREEN_ORDER = ['welcome','platforms','done'];
 const progressMap = { welcome:1, platforms:2, platflow:2, stores:3, done:4 };
 const topbarCopy = {
-  welcome: ['Welcome to Loop', "Let's get your account set up in under 15 minutes", '~12 min left'],
-  platforms: ['Connect Your Platforms', 'Click any platform to start the guided setup flow', '~10 min left'],
-  platflow: ['Platform Setup', 'Follow the steps to grant Loop access', '~8 min left'],
-  stores: ['Verify Your Locations', 'Confirm all stores are correctly synced', '~2 min left'],
+  welcome: ['Welcome to Loop', "Let's get your account set up — allow about 20 minutes", '~20 min left'],
+  platforms: ['Connect Your Platforms', 'Click any platform to start the guided setup flow', '~18 min left'],
+  platflow: ['Platform Setup', 'Follow the steps to grant Loop access', '~15 min left'],
+  stores: ['Verify Your Locations', 'Confirm all stores are correctly synced', '~3 min left'],
   done: ["You're Live!", 'All platforms connected and stores synced', 'Complete!']
 };
 
@@ -862,22 +882,44 @@ function updateProgress(screen) {
 }
 
 function updateSidebar(screen) {
-  const order=['welcome','platforms','stores','done'];
   const cur = progressMap[screen] || 1;
+  // Main nav items active state
   ['sb1','sb2','sb3','sb4'].forEach((id,i)=>{
     const el=document.getElementById(id);
     if(!el)return;
-    el.className='sb-item'+(i+1===cur?' active':'');
+    const isPlat = screen==='platflow' && i===1;
+    el.className='sb-item'+((i+1===cur||isPlat)?' active':'');
   });
-  ['sbt1','sbt2','sbt3','sbt4'].forEach((id,i)=>{
-    const el=document.getElementById(id);
-    if(!el)return;
-    const d=el.querySelector('.st-dot');
-    el.className='st-step';
-    if(i+1<cur){el.classList.add('done');d.innerHTML='✓';}
-    else if(i+1===cur){el.classList.add('active');d.textContent=i+1;}
-    else{d.textContent=i+1;}
+  // Platform sub-items active state
+  ['dd','ue','gh'].forEach(p=>{
+    const el=document.getElementById('sbp-'+p);
+    if(el) el.className='sb-sub'+(screen==='platflow'&&S.platflow===p?' active':'');
   });
+  // RAG indicators
+  // Step 1 (Welcome): always green once visited
+  setRag('rag1','green');
+  // Step 2 (Platforms)
+  const allDone=S.dd==='ok'&&S.ue==='ok'&&S.gh==='ok';
+  const anyStarted=S.dd!=='todo'||S.ue!=='todo'||S.gh!=='todo';
+  setRag('rag2', allDone?'green': anyStarted?'amber':'red');
+  // Platform sub-items
+  setRag('ragdd', S.dd==='ok'?'green': S.dd==='in-progress'?'amber':'red');
+  setRag('rague', S.ue==='ok'?'green': S.ue==='in-progress'?'amber':'red');
+  setRag('raggh', S.gh==='ok'?'green': S.gh==='in-progress'?'amber':'red');
+  // Step 3 (Stores)
+  setRag('rag3', cur>2? (cur>3?'green':'amber') :'red');
+  // Step 4 (Done)
+  setRag('rag4', cur>=4?'green':'red');
+}
+
+function setRag(id, color) {
+  const el=document.getElementById(id);
+  if(el){el.className='sb-rag '+color;}
+}
+
+function navToPlat(p) {
+  if(S[p]==='todo') S[p]='in-progress';
+  startPlatflow(p);
 }
 
 // ═══ PLATFORM FLOW ═══
@@ -905,8 +947,19 @@ function renderPlatflow() {
   renderStepProg();
   // Render step content
   renderStepContent();
-  // Update buddy
-  updateBuddy('platflow');
+  // Update buddy — only add stage divider on step 1 (platform entry), otherwise just add message
+  const stageKey = `platflow-${p}`;
+  if(S.step === 1 && lastBuddyStage !== stageKey) {
+    updateBuddy('platflow');
+  } else {
+    // Just update the quick reply context without re-dividing
+    const step = S.step;
+    const ctx = (S.ddErr && p==='dd' && step===5)
+      ? BUDDY.platflow.dd_err[5]
+      : (BUDDY.platflow[p]||{})[step];
+    if(ctx){ bAdd(ctx.msg); renderReplies(ctx.replies||[]); }
+  }
+  updateSidebar('platflow');
 }
 
 function renderStepProg() {
@@ -1207,7 +1260,24 @@ function copyEmail(p) {
 }
 
 // ═══ BUDDY ═══
+const STAGE_LABELS = {
+  welcome: 'Getting Started',
+  platforms: 'Platform Selection',
+  'platflow-dd': 'DoorDash Setup',
+  'platflow-ue': 'Uber Eats Setup',
+  'platflow-gh': 'GrubHub Setup',
+  stores: 'Store Verification',
+  done: 'Go Live'
+};
+let lastBuddyStage = null;
+
 function updateBuddy(screen) {
+  const stageKey = screen==='platflow' ? `platflow-${S.platflow}` : screen;
+  // Insert a stage divider whenever the context changes
+  if(stageKey !== lastBuddyStage) {
+    lastBuddyStage = stageKey;
+    bStage(STAGE_LABELS[stageKey] || stageKey);
+  }
   let ctx;
   if(screen === 'platflow') {
     const p = S.platflow;
@@ -1223,6 +1293,15 @@ function updateBuddy(screen) {
   if(!ctx) return;
   bAdd(ctx.msg);
   renderReplies(ctx.replies || []);
+}
+
+function bStage(label) {
+  const msgs = document.getElementById('bmsgs');
+  const d = document.createElement('div');
+  d.className = 'buddy-stage';
+  d.textContent = label;
+  msgs.appendChild(d);
+  msgs.scrollTop = msgs.scrollHeight;
 }
 
 function renderReplies(replies) {
