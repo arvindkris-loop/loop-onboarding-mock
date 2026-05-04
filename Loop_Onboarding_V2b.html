@@ -1,0 +1,1832 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Loop - Self-Serve Onboarding V2b</title>
+<style>
+:root {
+  --navy: #09234b;
+  --navy-light: #0e3066;
+  --teal: #196e82;
+  --teal-light: #1a8a9e;
+  --mint: #84e1cc;
+  --green: #07bc0c;
+  --green-bg: #e8f9e8;
+  --amber: #f59e0b;
+  --amber-bg: #fef3c7;
+  --red: #e74c3c;
+  --red-bg: #fde8e8;
+  --bg: #f0f5f8;
+  --white: #ffffff;
+  --gray-50: #fafbfc;
+  --gray-100: #f7f8fa;
+  --gray-200: #e8ecf1;
+  --gray-300: #d1d5db;
+  --gray-500: #6b7280;
+  --gray-700: #374151;
+  --radius: 16px;
+  --radius-sm: 10px;
+  --radius-xs: 6px;
+  --shadow: 0 2px 12px rgba(9,35,75,0.08);
+  --shadow-lg: 0 8px 32px rgba(9,35,75,0.12);
+  --font: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, sans-serif;
+  --max-w: 480px;
+  --dd-color: #ff3008;
+  --ue-color: #06c167;
+  --gh-color: #e3342f;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; overflow: hidden; }
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--navy);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* ── App Shell ── */
+#app {
+  width: 100%; max-width: var(--max-w);
+  height: 100vh; height: 100dvh;
+  display: flex; flex-direction: column;
+  background: var(--white);
+  position: relative; overflow: hidden;
+}
+
+/* ── Top Bar ── */
+.topbar {
+  flex-shrink: 0;
+  background: var(--navy);
+  color: var(--white);
+  padding: 14px 16px 10px;
+  display: flex; flex-direction: column; gap: 6px;
+  z-index: 10;
+}
+.topbar-row {
+  display: flex; align-items: center; justify-content: space-between;
+}
+.topbar-logo { font-size: 18px; font-weight: 700; letter-spacing: -0.3px; }
+.topbar-logo span { color: var(--mint); }
+.topbar-meta {
+  display: flex; align-items: center; gap: 8px;
+}
+.topbar-track {
+  font-size: 11px; color: var(--mint); opacity: 0.85;
+  background: rgba(132,225,204,0.12);
+  padding: 2px 8px; border-radius: 10px;
+  display: none;
+}
+.topbar-track.show { display: inline-block; }
+.topbar-time { font-size: 12px; color: var(--mint); opacity: 0.9; }
+.topbar-row2 {
+  display: flex; align-items: center; gap: 6px;
+}
+.topbar-steps { display: flex; gap: 3px; flex: 1; }
+.topbar-step {
+  height: 4px; flex: 1; border-radius: 2px;
+  background: rgba(255,255,255,0.15);
+  transition: background 0.4s;
+}
+.topbar-step.done { background: var(--mint); }
+.topbar-step.active { background: var(--teal-light); }
+.journey-btn {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+  color: var(--mint); font-size: 13px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+.journey-btn:active { background: rgba(255,255,255,0.2); }
+
+/* ── Journey Map Overlay ── */
+.journey-overlay {
+  position: absolute; inset: 0; z-index: 50;
+  background: rgba(9,35,75,0.92);
+  display: none; flex-direction: column;
+  padding: 60px 24px 32px;
+  overflow-y: auto;
+  animation: fadeIn 0.25s ease;
+}
+.journey-overlay.show { display: flex; }
+.journey-close {
+  position: absolute; top: 16px; right: 16px;
+  width: 32px; height: 32px; border-radius: 50%;
+  background: rgba(255,255,255,0.1); border: none;
+  color: var(--white); font-size: 18px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+}
+.journey-title {
+  color: var(--white); font-size: 18px; font-weight: 700;
+  margin-bottom: 20px;
+}
+.journey-step {
+  display: flex; gap: 12px; padding-bottom: 4px;
+  position: relative;
+}
+.journey-step:not(:last-child)::after {
+  content: ''; position: absolute;
+  left: 13px; top: 28px; bottom: -4px;
+  width: 2px; background: rgba(255,255,255,0.12);
+}
+.journey-step.done:not(:last-child)::after { background: var(--green); opacity: 0.5; }
+.journey-step.active:not(:last-child)::after { background: var(--amber); opacity: 0.5; }
+.journey-dot {
+  width: 28px; height: 28px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; flex-shrink: 0;
+  z-index: 1;
+}
+.journey-step.done .journey-dot { background: var(--green); color: #fff; }
+.journey-step.active .journey-dot { background: var(--amber); color: #fff; }
+.journey-step.upcoming .journey-dot { background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.4); }
+.journey-text { padding: 4px 0 16px; }
+.journey-text h4 {
+  font-size: 14px; font-weight: 600;
+}
+.journey-step.done .journey-text h4 { color: rgba(255,255,255,0.7); }
+.journey-step.active .journey-text h4 { color: var(--white); }
+.journey-step.upcoming .journey-text h4 { color: rgba(255,255,255,0.4); }
+.journey-text p {
+  font-size: 12px; margin-top: 2px;
+  color: rgba(255,255,255,0.4);
+}
+.journey-step.active .journey-text p { color: rgba(255,255,255,0.6); }
+.journey-sub {
+  padding-left: 40px;
+  margin-top: -10px;
+  margin-bottom: 8px;
+}
+.journey-sub span {
+  display: block;
+  font-size: 12px; color: rgba(255,255,255,0.45);
+  padding: 2px 0;
+}
+.journey-step.active .journey-sub span { color: var(--mint); }
+.journey-step.done .journey-sub span { color: rgba(255,255,255,0.5); }
+
+/* ── Chat Area ── */
+.chat-area {
+  flex: 1; overflow-y: auto; padding: 16px;
+  display: flex; flex-direction: column; gap: 10px;
+  scroll-behavior: smooth; -webkit-overflow-scrolling: touch;
+}
+.chat-area::-webkit-scrollbar { width: 0; }
+
+/* ── Messages ── */
+.msg {
+  max-width: 88%; padding: 12px 16px;
+  border-radius: var(--radius); font-size: 15px; line-height: 1.5;
+  animation: fadeUp 0.3s ease; word-wrap: break-word;
+}
+.msg.bot {
+  align-self: flex-start;
+  background: var(--gray-100);
+  border-bottom-left-radius: 4px;
+  color: var(--navy);
+}
+.msg.user {
+  align-self: flex-end;
+  background: var(--navy);
+  color: var(--white);
+  border-bottom-right-radius: 4px;
+}
+.msg.system {
+  align-self: center; background: transparent;
+  color: var(--gray-500); font-size: 12px;
+  text-align: center; padding: 6px 8px;
+  letter-spacing: 0.3px;
+}
+
+/* ── Typing ── */
+.typing {
+  align-self: flex-start; display: flex; gap: 4px;
+  padding: 12px 18px;
+  background: var(--gray-100);
+  border-radius: var(--radius); border-bottom-left-radius: 4px;
+}
+.typing span {
+  width: 7px; height: 7px;
+  background: var(--gray-300); border-radius: 50%;
+  animation: bounce 1.2s infinite;
+}
+.typing span:nth-child(2) { animation-delay: 0.15s; }
+.typing span:nth-child(3) { animation-delay: 0.3s; }
+
+/* ── Cards ── */
+.card {
+  background: var(--white);
+  border: 1.5px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px; margin-top: 4px;
+}
+.card.highlight { border-color: var(--teal); background: #f0fafb; }
+.card.success { border-color: var(--green); background: var(--green-bg); }
+.card.warning { border-color: var(--amber); background: var(--amber-bg); }
+.card.error { border-color: var(--red); background: var(--red-bg); }
+.card.navy-card { border-color: var(--navy); background: var(--gray-50); }
+.card-title {
+  font-weight: 600; font-size: 14px; margin-bottom: 6px;
+  display: flex; align-items: center; gap: 6px;
+}
+.card-body { font-size: 13px; line-height: 1.6; color: var(--gray-700); }
+.card-divider {
+  height: 1px; background: var(--gray-200);
+  margin: 10px 0;
+}
+
+/* ── Platform pills ── */
+.plat-pill {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 10px; border-radius: 20px;
+  font-size: 12px; font-weight: 600;
+}
+.plat-pill.dd { background: #fff0ed; color: var(--dd-color); }
+.plat-pill.ue { background: #e6f9ef; color: var(--ue-color); }
+.plat-pill.gh { background: #fde8e8; color: var(--gh-color); }
+
+/* ── Step rows ── */
+.step-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 7px 0; font-size: 13px;
+}
+.step-num {
+  width: 24px; height: 24px; border-radius: 50%;
+  background: var(--teal); color: var(--white);
+  font-size: 12px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.step-num.done { background: var(--green); }
+.step-num.pending { background: var(--gray-300); }
+
+/* ── Copyable field ── */
+.copy-field {
+  display: flex; align-items: center;
+  background: var(--gray-100); border: 1px solid var(--gray-200);
+  border-radius: var(--radius-xs);
+  padding: 10px 12px; gap: 8px;
+  cursor: pointer; transition: border-color 0.2s; margin: 6px 0;
+}
+.copy-field:active { border-color: var(--teal); }
+.copy-field-text {
+  flex: 1;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 13px; color: var(--navy);
+  user-select: all; word-break: break-all;
+}
+.copy-field-btn {
+  font-size: 11px; color: var(--teal); font-weight: 600; white-space: nowrap;
+}
+
+/* ── Quick Replies ── */
+.replies {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  padding: 6px 0; animation: fadeUp 0.3s ease;
+}
+.reply-btn {
+  padding: 10px 16px; border-radius: 20px;
+  border: 1.5px solid var(--teal); background: var(--white);
+  color: var(--teal); font-size: 14px; font-weight: 500;
+  cursor: pointer; transition: all 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.reply-btn:active { background: var(--teal); color: var(--white); transform: scale(0.97); }
+.reply-btn.primary { background: var(--teal); color: var(--white); border-color: var(--teal); }
+.reply-btn.primary:active { background: var(--teal-light); }
+
+/* ── Bottom Input ── */
+.input-bar {
+  flex-shrink: 0; padding: 10px 16px;
+  padding-bottom: max(10px, env(safe-area-inset-bottom));
+  background: var(--white); border-top: 1px solid var(--gray-200);
+  display: flex; align-items: center; gap: 8px; z-index: 10;
+}
+.input-bar input {
+  flex: 1; padding: 12px 16px; border-radius: 24px;
+  border: 1.5px solid var(--gray-200);
+  font-size: 15px; font-family: var(--font);
+  color: var(--navy); outline: none;
+  transition: border-color 0.2s; background: var(--gray-100);
+}
+.input-bar input:focus { border-color: var(--teal); background: var(--white); }
+.input-bar input::placeholder { color: var(--gray-300); }
+.send-btn {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: var(--navy); border: none;
+  color: var(--white); font-size: 18px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: background 0.15s;
+}
+.send-btn:active { background: var(--teal); }
+
+/* ── Data row (for billing/contract pre-fill) ── */
+.data-row {
+  display: flex; justify-content: space-between; align-items: baseline;
+  padding: 5px 0; font-size: 13px;
+}
+.data-row .label { color: var(--gray-500); }
+.data-row .value { font-weight: 600; color: var(--navy); text-align: right; }
+.data-row.total {
+  border-top: 1px solid var(--gray-200);
+  margin-top: 4px; padding-top: 8px;
+  font-size: 14px;
+}
+.data-row.total .value { color: var(--teal); }
+
+/* ── Product tag ── */
+.product-tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }
+.product-tag {
+  display: inline-flex; align-items: center;
+  padding: 4px 10px; border-radius: 16px;
+  font-size: 12px; font-weight: 500;
+  background: #edf5ff; color: #1a56db; border: 1px solid #c3dafe;
+}
+
+/* ── Progress FAB ── */
+.progress-fab {
+  position: absolute; top: 76px; right: 12px;
+  background: var(--white); border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-lg); padding: 10px 14px;
+  z-index: 20; display: none; min-width: 200px;
+  animation: fadeUp 0.2s ease;
+}
+.progress-fab.show { display: block; }
+.progress-fab h4 {
+  font-size: 11px; color: var(--gray-500);
+  text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;
+}
+.progress-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 5px 0; font-size: 13px;
+}
+.progress-dot {
+  width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+}
+.progress-dot.done { background: var(--green); }
+.progress-dot.active { background: var(--amber); }
+.progress-dot.pending { background: var(--gray-300); }
+
+/* ── Access bar (80% threshold) ── */
+.access-bar-wrap {
+  margin: 8px 0;
+}
+.access-bar-label {
+  display: flex; justify-content: space-between;
+  font-size: 11px; color: var(--gray-500); margin-bottom: 4px;
+}
+.access-bar {
+  height: 8px; background: var(--gray-200); border-radius: 4px;
+  overflow: hidden; position: relative;
+}
+.access-bar-fill {
+  height: 100%; border-radius: 4px;
+  transition: width 0.6s ease;
+}
+.access-bar-fill.low { background: var(--amber); }
+.access-bar-fill.good { background: var(--green); }
+.access-bar-threshold {
+  position: absolute; top: -3px; bottom: -3px;
+  width: 2px; background: var(--navy);
+  opacity: 0.4;
+}
+
+/* ── Celebration ── */
+.celebration {
+  position: absolute; inset: 0;
+  background: rgba(9,35,75,0.9);
+  display: none; flex-direction: column;
+  align-items: center; justify-content: center;
+  z-index: 100; animation: fadeIn 0.4s ease;
+  text-align: center; padding: 32px;
+}
+.celebration.show { display: flex; }
+.celebration h2 { color: var(--white); font-size: 26px; margin-bottom: 8px; }
+.celebration p { color: var(--mint); font-size: 15px; line-height: 1.5; margin-bottom: 6px; }
+.celebration .sub { color: rgba(255,255,255,0.5); font-size: 13px; margin-bottom: 24px; }
+.celebration .cta {
+  padding: 14px 32px; background: var(--mint); color: var(--navy);
+  border: none; border-radius: 24px; font-size: 16px; font-weight: 600; cursor: pointer;
+}
+
+/* ── Checklist ── */
+.checklist { list-style: none; padding: 0; }
+.checklist li { display: flex; align-items: center; gap: 8px; padding: 6px 0; font-size: 13px; }
+.check-icon {
+  width: 18px; height: 18px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; flex-shrink: 0;
+}
+.check-icon.done { background: var(--green); color: #fff; }
+.check-icon.pending { background: var(--gray-200); color: var(--gray-500); }
+.check-icon.running { background: var(--amber); color: #fff; }
+.check-icon.fail { background: var(--red); color: #fff; }
+
+/* ── Spinner ── */
+.spinner {
+  width: 16px; height: 16px;
+  border: 2px solid var(--gray-200); border-top-color: var(--teal);
+  border-radius: 50%; animation: spin 0.8s linear infinite;
+  display: inline-block; vertical-align: middle;
+}
+.spinner-sm { width: 12px; height: 12px; border-width: 1.5px; }
+
+/* ── Animations ── */
+@keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes bounce { 0%,60%,100% { transform: translateY(0); } 30% { transform: translateY(-4px); } }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Responsive desktop ── */
+@media (min-width: 481px) {
+  #app { height: 92vh; max-height: 880px; border-radius: 24px; box-shadow: var(--shadow-lg); margin: 16px auto; }
+  .topbar { border-radius: 24px 24px 0 0; }
+}
+@supports (padding-top: env(safe-area-inset-top)) {
+  .topbar { padding-top: calc(14px + env(safe-area-inset-top)); }
+}
+</style>
+</head>
+<body>
+
+<div id="app">
+  <!-- Top Bar -->
+  <div class="topbar">
+    <div class="topbar-row">
+      <div class="topbar-logo">Loop<span>AI</span></div>
+      <div class="topbar-meta">
+        <span class="topbar-track" id="trackLabel"></span>
+        <span class="topbar-time" id="timeEst">~15 min</span>
+      </div>
+    </div>
+    <div class="topbar-row2">
+      <div class="topbar-steps" id="topSteps">
+        <div class="topbar-step" data-s="0"></div>
+        <div class="topbar-step" data-s="1"></div>
+        <div class="topbar-step" data-s="2"></div>
+        <div class="topbar-step" data-s="3"></div>
+      </div>
+      <div class="journey-btn" id="journeyBtn" title="View full journey">&#9776;</div>
+    </div>
+  </div>
+
+  <!-- Journey Map Overlay -->
+  <div class="journey-overlay" id="journeyOverlay">
+    <button class="journey-close" id="journeyClose">&times;</button>
+    <div class="journey-title">Your Onboarding Journey</div>
+    <div id="journeySteps"></div>
+  </div>
+
+  <!-- Progress FAB -->
+  <div class="progress-fab" id="progFab">
+    <h4 id="progFabTitle">Platform Access</h4>
+    <div id="progList"></div>
+  </div>
+
+  <!-- Chat Area -->
+  <div class="chat-area" id="chat"></div>
+
+  <!-- Input Bar -->
+  <div class="input-bar">
+    <input type="text" id="userInput" placeholder="Type a message..." autocomplete="off">
+    <button class="send-btn" id="sendBtn" aria-label="Send">&#9654;</button>
+  </div>
+
+  <!-- Celebration -->
+  <div class="celebration" id="celebration">
+    <h2 id="celebTitle">You're all set!</h2>
+    <p id="celebMsg">Your part of onboarding is complete.</p>
+    <p class="sub" id="celebSub">We'll verify everything and your CS manager will reach out.</p>
+    <button class="cta" onclick="location.reload()">Back to Dashboard</button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════
+const S = {
+  role: null,           // 'admin' | 'cfo'
+  phase: 'welcome',
+  userName: '',
+  companyName: 'Acme Restaurants',
+
+  // Contract data — piped from PandaDoc (step 4)
+  // New product architecture: Measure, Protect, Grow, Connect, AI BI
+  // No % success fee — Recover is a workflow within Protect
+  contract: {
+    signedDate: 'Apr 28, 2026',
+    term: '12 months',
+    autoRenew: true,
+    paymentTerms: 'Net 30',
+    segment: 'Mid-Market',
+    locations: 52,
+    products: [
+      {
+        name: 'Protect', ppl: 100,
+        datastreams: ['3PD Operations'],
+        alerts: ['SPR', 'SOTU', '86d', 'Store Downtime', 'Digests', 'Day Part', 'Delivery Intel'],
+        workflows: ['Recover', 'Restore', 'DWT Disputes'],
+        connectors: ['CCTV', 'PoS', 'Olo', '3PD'],
+        note: 'Includes Samantha AI assistant'
+      },
+      {
+        name: 'Measure', ppl: 100,
+        datastreams: ['3PD Finance', 'Revenue Finance'],
+        alerts: ['P&L Report'],
+        workflows: ['JE Push'],
+        connectors: ['3PD Finance', 'Olo', 'PoS', 'Accounting', 'Bank'],
+        note: null
+      }
+    ],
+    totalPPL: 200,       // Protect $100 + Measure $100
+    billingEntity: 'Acme Restaurants LLC',
+    billingAddress: '1234 Main St, Chicago, IL 60601',
+    apContact: { name: 'Sarah Chen', email: 'sarah.chen@acmerestaurants.com' },
+    signeeName: 'Michael Torres',
+    adminName: 'Jamie Park',
+    adminEmail: 'jamie.park@acmerestaurants.com',
+    // Full product catalog for reference/upsell context
+    catalog: {
+      measure: { name: 'Measure', ppl: 100 },
+      protect: { name: 'Protect', ppl: 100 },
+      grow: { name: 'Grow', ppl: 200 },
+      connect: { name: 'Connect', ppl: 99 },
+      aibi: { name: 'AI BI', ppl: 99 },
+      samantha: { note: 'Included with Protect >= $100, otherwise +$25' },
+      addons: [
+        { desc: 'Has Protect, add Finance & Marketing analytics', ppl: 100 },
+        { desc: 'Has Grow, add Finance analytics', ppl: 50 }
+      ]
+    }
+  },
+
+  // Platform state (admin track)
+  // 52 unique locations; not all locations on every platform
+  platIdx: 0,
+  platStep: 0,
+  platforms: {
+    dd: { name: 'DoorDash', code: 'dd', status: 'pending', email: 'onboarding+acme@loopkitchen.com', role: 'Business Admin', stores: 52 },
+    ue: { name: 'Uber Eats', code: 'ue', status: 'pending', email: 'onboarding+acme@loopkitchen.com', role: 'Full Access', stores: 48 },
+    gh: { name: 'Grubhub', code: 'gh', status: 'pending', email: 'onboarding+acme@loopkitchen.com', role: 'Admin (NOT Basic)', stores: 41 }
+  },
+  platOrder: ['dd', 'ue', 'gh'],
+  accessStores: 0,    // running total of verified stores across all platforms
+  accessThreshold: 0.8,
+  // totalPlatformStores computed after init: sum of all platform store counts
+  get totalPlatformStores() { return this.platOrder.reduce((s,c) => s + this.platforms[c].stores, 0); },
+
+  // Billing state (CFO track)
+  billingStep: 0,
+
+  // Flags
+  _ueRetried: false,
+  _billingEntityEdited: false,
+  _billingStructure: null,  // 'single' | 'per_location' | 'custom'
+  _paymentCompleted: false
+};
+
+const $ = s => document.querySelector(s);
+const $$ = s => document.querySelectorAll(s);
+const chat = $('#chat');
+const DELAYS = { short: 400, med: 700, long: 1200, type: 550 };
+
+// ═══════════════════════════════════════════════════════
+// CHAT ENGINE
+// ═══════════════════════════════════════════════════════
+function scrollDown() { requestAnimationFrame(() => chat.scrollTop = chat.scrollHeight); }
+
+function addMsg(text, type = 'bot') {
+  removeTyping(); removeReplies();
+  const d = document.createElement('div');
+  d.className = `msg ${type}`;
+  d.innerHTML = text;
+  chat.appendChild(d); scrollDown();
+  return d;
+}
+
+function addCard(html, cls = '') {
+  removeTyping();
+  const d = document.createElement('div');
+  d.className = 'msg bot';
+  d.innerHTML = `<div class="card ${cls}">${html}</div>`;
+  chat.appendChild(d); scrollDown();
+  return d;
+}
+
+function addSystem(text) {
+  const d = document.createElement('div');
+  d.className = 'msg system';
+  d.textContent = text;
+  chat.appendChild(d); scrollDown();
+}
+
+function showTyping() {
+  removeTyping();
+  const d = document.createElement('div');
+  d.className = 'typing'; d.id = 'typingEl';
+  d.innerHTML = '<span></span><span></span><span></span>';
+  chat.appendChild(d); scrollDown();
+}
+
+function removeTyping() { const t = $('#typingEl'); if (t) t.remove(); }
+function removeReplies() { $$('.replies').forEach(r => r.remove()); }
+
+function showReplies(options, callback) {
+  removeReplies();
+  const wrap = document.createElement('div');
+  wrap.className = 'replies';
+  options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = `reply-btn${opt.primary ? ' primary' : ''}`;
+    btn.textContent = opt.label;
+    btn.onclick = () => {
+      addMsg(opt.label, 'user');
+      removeReplies();
+      callback(opt.value || opt.label);
+    };
+    wrap.appendChild(btn);
+  });
+  chat.appendChild(wrap); scrollDown();
+}
+
+function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+async function botSays(text, cardCls) {
+  showTyping(); await delay(DELAYS.type);
+  if (cardCls !== undefined) return addCard(text, cardCls);
+  return addMsg(text, 'bot');
+}
+
+function waitForInput(callback) {
+  const handler = () => {
+    const v = $('#userInput').value.trim();
+    if (!v) return;
+    addMsg(v, 'user');
+    $('#userInput').value = '';
+    $('#userInput').placeholder = 'Type a message...';
+    $('#sendBtn').removeEventListener('click', handler);
+    $('#userInput').removeEventListener('keydown', keyHandler);
+    callback(v);
+  };
+  const keyHandler = e => { if (e.key === 'Enter') handler(); };
+  $('#sendBtn').addEventListener('click', handler);
+  $('#userInput').addEventListener('keydown', keyHandler);
+}
+
+// ═══════════════════════════════════════════════════════
+// PROGRESS & JOURNEY
+// ═══════════════════════════════════════════════════════
+const PHASE_MAP = {
+  welcome: 0, lifecycle: 0, role_select: 0,
+  track_overview: 1,
+  platform: 2, billing: 2,
+  summary: 3, next_steps: 3, done: 3
+};
+
+function updateProgress() {
+  const idx = PHASE_MAP[S.phase] ?? 0;
+  $$('.topbar-step').forEach((el, i) => {
+    el.classList.toggle('done', i < idx);
+    el.classList.toggle('active', i === idx);
+  });
+  const timeMap = {
+    welcome: '~15 min', lifecycle: '~14 min', role_select: '~13 min',
+    track_overview: '~12 min',
+    platform: `~${Math.max(2, 10 - S.platIdx * 3)} min`,
+    billing: `~${Math.max(2, 8 - S.billingStep * 2)} min`,
+    summary: '~1 min', next_steps: '~1 min', done: 'Done!'
+  };
+  $('#timeEst').textContent = timeMap[S.phase] || '';
+}
+
+function setTrackLabel(text) {
+  const el = $('#trackLabel');
+  el.textContent = text;
+  el.classList.add('show');
+}
+
+// Journey Map
+const JOURNEY_STEPS = [
+  { num: 1, title: 'Contract Signed', status: 'done', sub: ['Products confirmed', 'Pricing confirmed', 'Billing info received', 'Admin info received'] },
+  { num: 2, title: 'Account Setup', status: 'active', sub: ['Platform access \u2192 Tech Admin', 'Billing setup \u2192 Billing Contact'] },
+  { num: 3, title: 'Verification', status: 'upcoming', sub: ['We check all connections (1-2 days)'] },
+  { num: 4, title: 'Meet Your CS Manager', status: 'upcoming', sub: null },
+  { num: 5, title: 'Product Onboarding', status: 'upcoming', sub: ['Measure', 'Protect', 'Grow', 'Connect', 'AI BI'] }
+];
+
+function renderJourney() {
+  let html = '';
+  JOURNEY_STEPS.forEach(s => {
+    const icon = s.status === 'done' ? '&#10003;' : s.num;
+    html += `<div class="journey-step ${s.status}">
+      <div class="journey-dot">${icon}</div>
+      <div class="journey-text">
+        <h4>${s.title}</h4>
+        ${s.status === 'active' ? '<p>You are here</p>' : s.status === 'done' ? '<p>Completed</p>' : '<p>Upcoming</p>'}
+      </div>
+    </div>`;
+    if (s.sub) {
+      html += `<div class="journey-sub ${s.status === 'active' ? '' : ''}">`;
+      s.sub.forEach(t => { html += `<span>${s.status === 'done' ? '&#10003; ' : s.status === 'active' ? '&#9656; ' : '&#9675; '}${t}</span>`; });
+      html += '</div>';
+    }
+  });
+  $('#journeySteps').innerHTML = html;
+}
+
+$('#journeyBtn').onclick = () => { renderJourney(); $('#journeyOverlay').classList.add('show'); };
+$('#journeyClose').onclick = () => $('#journeyOverlay').classList.remove('show');
+
+// Platform progress FAB
+function updatePlatProgress() {
+  const fab = $('#progFab');
+  fab.classList.add('show');
+  $('#progFabTitle').textContent = 'Platform Access';
+  let html = '';
+  S.platOrder.forEach(code => {
+    const p = S.platforms[code];
+    const dot = p.status === 'done' ? 'done' : p.status === 'active' ? 'active' : 'pending';
+    const label = p.status === 'done' ? `${p.stores} stores` : p.status === 'active' ? 'In Progress' : 'Pending';
+    html += `<div class="progress-item"><div class="progress-dot ${dot}"></div><span>${p.name}</span><span style="color:var(--gray-500);margin-left:auto;font-size:11px">${label}</span></div>`;
+  });
+  // Access bar
+  const total = S.totalPlatformStores;
+  const threshold = Math.ceil(total * S.accessThreshold);
+  const pct = Math.round((S.accessStores / total) * 100);
+  const barPct = Math.min(100, pct);
+  const cls = pct >= 80 ? 'good' : 'low';
+  html += `<div class="access-bar-wrap">
+    <div class="access-bar-label"><span>${S.accessStores}/${total} stores</span><span>${pct}%</span></div>
+    <div class="access-bar"><div class="access-bar-fill ${cls}" style="width:${barPct}%"></div><div class="access-bar-threshold" style="left:80%"></div></div>
+    <div style="font-size:10px;color:var(--gray-500);margin-top:2px">Target: ${threshold}+ stores verified across all platforms</div>
+  </div>`;
+  $('#progList').innerHTML = html;
+}
+
+function updateBillingProgress() {
+  const fab = $('#progFab');
+  fab.classList.add('show');
+  $('#progFabTitle').textContent = 'Billing Setup';
+  const steps = [
+    { name: 'Verify Entity', done: S.billingStep > 1 },
+    { name: 'Confirm Terms', done: S.billingStep > 2 },
+    { name: 'Payment Method', done: S._paymentCompleted }
+  ];
+  let html = '';
+  steps.forEach((s, i) => {
+    const dot = s.done ? 'done' : (i + 1 === S.billingStep) ? 'active' : 'pending';
+    const label = s.done ? 'Done' : (i + 1 === S.billingStep) ? 'In Progress' : 'Pending';
+    html += `<div class="progress-item"><div class="progress-dot ${dot}"></div><span>${s.name}</span><span style="color:var(--gray-500);margin-left:auto;font-size:11px">${label}</span></div>`;
+  });
+  $('#progList').innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════════════
+// FLOW: WELCOME
+// ═══════════════════════════════════════════════════════
+async function startWelcome() {
+  S.phase = 'welcome';
+  updateProgress();
+
+  await delay(500);
+  await botSays(`Welcome to Loop self-serve onboarding! I'll guide you through everything — step by step, no guesswork.`);
+
+  await delay(300);
+  await botSays(`Let me show you where you are in the journey.`);
+  S.phase = 'lifecycle';
+  updateProgress();
+
+  // Show lifecycle card
+  await botSays(`
+    <div class="card-title">Your Onboarding Journey</div>
+    <div class="card-body">
+      <div class="step-row"><div class="step-num done">&#10003;</div><span style="color:var(--gray-500)">Contract Signed</span></div>
+      <div class="step-row" style="background:#f0fafb;margin:0 -16px;padding:8px 16px;border-radius:6px"><div class="step-num" style="background:var(--amber)">2</div><strong>Account Setup &larr; You are here</strong></div>
+      <div class="step-row"><div class="step-num pending">3</div><span style="color:var(--gray-500)">Verification (1-2 days)</span></div>
+      <div class="step-row"><div class="step-num pending">4</div><span style="color:var(--gray-500)">Meet Your CS Manager</span></div>
+      <div class="step-row"><div class="step-num pending">5</div><span style="color:var(--gray-500)">Product Onboarding</span></div>
+    </div>
+    <div style="margin-top:8px;font-size:11px;color:var(--gray-500)">Tap &#9776; anytime to see this map</div>
+  `, 'highlight');
+
+  await delay(500);
+
+  // Show piped contract data
+  await botSays(`Your contract was signed on <strong>${S.contract.signedDate}</strong>. Here's what we have on file:`);
+
+  const prods = S.contract.products.map(p => p.name).join(' + ');
+  const totalPPL = S.contract.totalPPL;
+  const mrr = totalPPL * S.contract.locations;
+  await botSays(`
+    <div class="card-title">Data Received from Contract</div>
+    <div class="card-body">
+      <div class="data-row"><span class="label">Products</span><span class="value">${prods}</span></div>
+      <div class="data-row"><span class="label">Total PPL</span><span class="value">$${totalPPL}/loc/mo</span></div>
+      <div class="data-row"><span class="label">MRR</span><span class="value">$${mrr.toLocaleString()}/mo</span></div>
+      <div class="data-row"><span class="label">Locations</span><span class="value">${S.contract.locations}</span></div>
+      <div class="data-row"><span class="label">Segment</span><span class="value">${S.contract.segment}</span></div>
+      <div class="card-divider"></div>
+      <div style="font-size:11px;color:var(--gray-500)">
+        All contract data received and verified &nbsp;&#10003;
+      </div>
+    </div>
+  `, 'success');
+
+  await delay(400);
+  await botSays(`Two things need to happen now — they run in parallel:`);
+  await botSays(`
+    <div class="card-body">
+      <div class="step-row"><div class="step-num">A</div><span><strong>Access &amp; Tech Integration</strong> &mdash; for the technology admin (${S.contract.adminName})</span></div>
+      <div class="step-row"><div class="step-num">B</div><span><strong>Business &amp; Billing</strong> &mdash; for the contract signee/CFO (${S.contract.signeeName})</span></div>
+    </div>
+  `, 'navy-card');
+
+  await delay(300);
+  S.phase = 'role_select';
+  await botSays(`Which one are you here for?`);
+
+  showReplies([
+    { label: "I'm the Tech Admin", primary: true, value: 'admin' },
+    { label: "I'm the Billing Contact", value: 'cfo' }
+  ], async (val) => {
+    S.role = val;
+    if (val === 'admin') {
+      S.userName = S.contract.adminName;
+      await startAdminTrack();
+    } else {
+      S.userName = S.contract.signeeName;
+      await startCFOTrack();
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// ADMIN TRACK: ACCESS & TECHNOLOGY INTEGRATION
+// ═══════════════════════════════════════════════════════
+async function startAdminTrack() {
+  S.phase = 'track_overview';
+  updateProgress();
+  setTrackLabel('Access & Tech');
+
+  addSystem('Track A: Access & Technology Integration');
+
+  await botSays(`Great, ${S.userName}! You're handling <strong>Access &amp; Technology Integration</strong>.`);
+
+  const totalStores = S.totalPlatformStores;
+  const threshold = Math.ceil(totalStores * S.accessThreshold);
+
+  await botSays(`
+    <div class="card-title">Your Track: Access Setup</div>
+    <div class="card-body">
+      <div class="step-row"><div class="step-num">1</div><span>Copy Loop's email address</span></div>
+      <div class="step-row"><div class="step-num">2</div><span>Add it as a user on each platform</span></div>
+      <div class="step-row"><div class="step-num">3</div><span>We verify access automatically</span></div>
+      <div class="card-divider"></div>
+      <div style="font-size:12px;color:var(--gray-700)">
+        <strong>3 platforms</strong> &middot; DoorDash, Uber Eats, Grubhub<br>
+        <strong>~3 min each</strong> &middot; max 3 actions per step<br>
+        <strong>Goal:</strong> connect ${threshold}+ stores (80% of ${totalStores}) to get you up and running
+      </div>
+    </div>
+  `, 'highlight');
+
+  await delay(300);
+  await botSays(`Meanwhile, <strong>${S.contract.signeeName}</strong> will get a separate link for billing setup. You don't need to handle that.`);
+  await delay(200);
+  await botSays(`<strong>Next:</strong> We'll start with DoorDash — the most common platform. Ready?`);
+
+  showReplies([
+    { label: "Let's start!", primary: true },
+    { label: 'How does verification work?' }
+  ], async (val) => {
+    if (val !== "Let's start!") {
+      await botSays(`After you add Loop's email on each platform, I check three things: <strong>1)</strong> user access exists, <strong>2)</strong> correct role/permissions, <strong>3)</strong> store coverage. You'll see the results live — no waiting or wondering.`);
+      await delay(200);
+      await botSays(`<strong>Next:</strong> Let's start with DoorDash.`);
+      showReplies([{ label: "Let's go!", primary: true }], () => startPlatform());
+    } else {
+      startPlatform();
+    }
+  });
+}
+
+// ── Platform Connect Flow ──
+async function startPlatform() {
+  S.phase = 'platform';
+  updateProgress();
+
+  const code = S.platOrder[S.platIdx];
+  const plat = S.platforms[code];
+  plat.status = 'active';
+  S.platStep = 0;
+  updatePlatProgress();
+
+  const num = S.platIdx + 1;
+  const total = S.platOrder.length;
+  const remaining = total - S.platIdx;
+
+  addSystem(`Platform ${num} of ${total}`);
+
+  await botSays(`
+    <div class="card-title"><span class="plat-pill ${code}">${plat.name}</span> &middot; Platform ${num}/${total}</div>
+    <div class="card-body">
+      <div class="data-row"><span class="label">Role needed</span><span class="value">${plat.role}</span></div>
+      <div class="data-row"><span class="label">Stores</span><span class="value">${plat.stores} locations</span></div>
+      <div class="data-row"><span class="label">Time</span><span class="value">~3 min</span></div>
+    </div>
+  `, 'highlight');
+
+  await delay(300);
+  await platStep1(code);
+}
+
+async function platStep1(code) {
+  const plat = S.platforms[code];
+  S.platStep = 1;
+
+  await botSays(`<strong>Step 1 of 3:</strong> Copy this email address — you'll add it to ${plat.name}.`);
+
+  await botSays(`
+    <div class="copy-field" onclick="copyEmail(this, '${plat.email}')">
+      <div class="copy-field-text">${plat.email}</div>
+      <div class="copy-field-btn">TAP TO COPY</div>
+    </div>
+    <div style="font-size:11px;color:var(--gray-500);margin-top:2px">Next: you'll add this email on ${plat.name}'s portal</div>
+  `);
+
+  await delay(200);
+  showReplies([
+    { label: 'Copied!', primary: true, value: 'copied' },
+    { label: "What's this email for?" }
+  ], async (val) => {
+    if (val !== 'copied') {
+      await botSays(`This is Loop's service account. Adding it as a user gives Loop <strong>read-only access</strong> to your store data — orders, reviews, metrics. We never make changes to your account.`);
+      await delay(200);
+      showReplies([{ label: 'Got it, copied!', primary: true }], () => platStep2(code));
+    } else {
+      platStep2(code);
+    }
+  });
+}
+
+async function platStep2(code) {
+  const plat = S.platforms[code];
+  S.platStep = 2;
+
+  const inst = {
+    dd: {
+      steps: ['Open <strong>DoorDash Merchant Portal</strong>', 'Go to <strong>Settings &rarr; Users</strong>', 'Click <strong>Add User</strong>, paste the email, select <strong>Business Admin</strong>'],
+      warning: null
+    },
+    ue: {
+      steps: ['Open <strong>Uber Eats Manager</strong>', 'Go to <strong>Users &rarr; Invite</strong>', 'Paste the email, select <strong>Full Access</strong> role'],
+      warning: null
+    },
+    gh: {
+      steps: ['Open <strong>Grubhub for Restaurants</strong>', 'Go to <strong>Account &rarr; Team Members</strong>', 'Paste the email, select <strong>Admin</strong> role'],
+      warning: 'Choose <strong>Admin</strong> — NOT Basic. Basic doesn\'t give Loop the access it needs.'
+    }
+  }[code];
+
+  await botSays(`<strong>Step 2 of 3:</strong> Add Loop as a user on ${plat.name}.`);
+
+  let cardHtml = '<div class="card-body">';
+  inst.steps.forEach((s, i) => { cardHtml += `<div class="step-row"><div class="step-num">${i+1}</div><span>${s}</span></div>`; });
+  cardHtml += '</div>';
+  if (inst.warning) {
+    cardHtml += `<div style="margin-top:10px;padding:8px 12px;background:var(--amber-bg);border-radius:6px;font-size:12px;color:#92400e">${inst.warning}</div>`;
+  }
+  cardHtml += `<div style="margin-top:8px;font-size:11px;color:var(--gray-500)">Next: I'll verify the connection automatically (~10 sec)</div>`;
+
+  await botSays(cardHtml, 'highlight');
+
+  await delay(300);
+  await botSays(`Once you've added the email with <strong>${plat.role}</strong> role, let me know.`);
+
+  showReplies([
+    { label: "Done, verify!", primary: true, value: 'verify' },
+    { label: 'I need help', value: 'help' },
+    { label: 'Skip for now', value: 'skip' }
+  ], async (val) => {
+    if (val === 'help') { await showPlatHelp(code); }
+    else if (val === 'skip') { await skipPlatform(code); }
+    else { platStep3(code); }
+  });
+}
+
+async function showPlatHelp(code) {
+  const plat = S.platforms[code];
+  const help = {
+    dd: `Detailed steps:<br><br>1. Log in at <strong>merchant.doordash.com</strong><br>2. Click the <strong>gear icon</strong> (top right)<br>3. Select <strong>Users</strong> from the dropdown<br>4. Hit <strong>+ Add User</strong><br><br>If you don't see "Users" in Settings, you may not have admin permissions. Ask your account owner to add Loop instead.`,
+    ue: `Detailed steps:<br><br>1. Log in at <strong>restaurant.uber.com</strong><br>2. Click <strong>Users</strong> in the left sidebar<br>3. Click <strong>Invite User</strong><br>4. Enter the email and select <strong>Full Access</strong><br><br>If you can't find Users, make sure you're on the main restaurant dashboard, not a single-store view.`,
+    gh: `Detailed steps:<br><br>1. Log in at <strong>restaurant.grubhub.com</strong><br>2. Click your name (top right) &rarr; <strong>Account</strong><br>3. Scroll to <strong>Team Members</strong><br>4. Click <strong>Add Member</strong><br><br>Remember: select <strong>Admin</strong>, not Basic!`
+  }[code];
+
+  await botSays(help);
+  await delay(200);
+  showReplies([
+    { label: "Done, verify!", primary: true, value: 'verify' },
+    { label: "Still stuck — skip for now", value: 'skip' }
+  ], async (val) => {
+    if (val === 'skip') { await skipPlatform(code); }
+    else { platStep3(code); }
+  });
+}
+
+async function skipPlatform(code) {
+  const plat = S.platforms[code];
+  plat.status = 'pending';
+  updatePlatProgress();
+  const remaining = S.platOrder.length - S.platIdx - 1;
+  const nextName = remaining > 0 ? S.platforms[S.platOrder[S.platIdx + 1]].name : null;
+  await botSays(`No worries — ${plat.name} saved for later. You can come back anytime.`);
+  if (nextName) {
+    await delay(200);
+    await botSays(`<strong>Next:</strong> ${nextName}. ${remaining} platform${remaining > 1 ? 's' : ''} remaining.`);
+  }
+  await delay(300);
+  nextPlatform();
+}
+
+async function platStep3(code) {
+  const plat = S.platforms[code];
+  S.platStep = 3;
+
+  await botSays(`<strong>Step 3 of 3:</strong> Verifying ${plat.name}...`);
+
+  const checkId = `cl-${code}-${Date.now()}`;
+  await botSays(`
+    <div class="card-body">
+      <ul class="checklist" id="${checkId}">
+        <li><span class="check-icon running"><span class="spinner spinner-sm"></span></span> Checking user access...</li>
+        <li><span class="check-icon pending">&#8226;</span> Validating role permissions</li>
+        <li><span class="check-icon pending">&#8226;</span> Confirming store coverage</li>
+      </ul>
+    </div>
+  `, 'highlight');
+
+  // Animate: step 1 done
+  await delay(800);
+  const el = $(`#${checkId}`);
+  const outcome = simulateVerification(code);
+
+  if (outcome === 'success') {
+    if (el) {
+      el.innerHTML = `
+        <li><span class="check-icon done">&#10003;</span> User access confirmed</li>
+        <li><span class="check-icon running"><span class="spinner spinner-sm"></span></span> Validating role permissions...</li>
+        <li><span class="check-icon pending">&#8226;</span> Confirming store coverage</li>`;
+    }
+    scrollDown();
+    await delay(700);
+    if (el) {
+      el.innerHTML = `
+        <li><span class="check-icon done">&#10003;</span> User access confirmed</li>
+        <li><span class="check-icon done">&#10003;</span> ${plat.role} role verified</li>
+        <li><span class="check-icon running"><span class="spinner spinner-sm"></span></span> Confirming store coverage...</li>`;
+    }
+    scrollDown();
+    await delay(700);
+    if (el) {
+      el.innerHTML = `
+        <li><span class="check-icon done">&#10003;</span> User access confirmed</li>
+        <li><span class="check-icon done">&#10003;</span> ${plat.role} role verified</li>
+        <li><span class="check-icon done">&#10003;</span> ${plat.stores}/${plat.stores} stores connected</li>`;
+      el.closest('.card').className = 'card success';
+    }
+    scrollDown();
+
+    plat.status = 'done';
+    S.accessStores += plat.stores;
+    updatePlatProgress();
+
+    await delay(400);
+    const totalStores = S.totalPlatformStores;
+    const pct = Math.round((S.accessStores / totalStores) * 100);
+    const threshold = Math.ceil(totalStores * S.accessThreshold);
+    const remaining = S.platOrder.length - S.platIdx - 1;
+
+    let statusMsg = `<strong>${plat.name} connected!</strong> ${plat.stores} stores verified.`;
+    statusMsg += `<br><span style="font-size:13px;color:var(--gray-700)">Access progress: <strong>${S.accessStores}/${totalStores}</strong> stores (${pct}%).`;
+    if (S.accessStores >= threshold) {
+      statusMsg += ` <span style="color:var(--green)">Target reached!</span>`;
+    } else {
+      statusMsg += ` ${threshold - S.accessStores} more to hit the target.`;
+    }
+    statusMsg += `</span>`;
+
+    await botSays(statusMsg);
+
+    if (remaining > 0) {
+      const nextCode = S.platOrder[S.platIdx + 1];
+      const nextPlat = S.platforms[nextCode];
+      await delay(200);
+      await botSays(`<strong>Next:</strong> ${nextPlat.name}. ${remaining} platform${remaining > 1 ? 's' : ''} remaining. Same process — should be quick.`);
+      showReplies([{ label: `Start ${nextPlat.name}`, primary: true }], () => nextPlatform());
+    } else {
+      await delay(200);
+      showReplies([{ label: 'See summary', primary: true }], () => finishTrack());
+    }
+  } else {
+    // Error
+    if (el) {
+      if (outcome === 'role_error') {
+        el.innerHTML = `
+          <li><span class="check-icon done">&#10003;</span> User access confirmed</li>
+          <li><span class="check-icon fail">&#10007;</span> Wrong role: Basic (expected ${plat.role})</li>
+          <li><span class="check-icon pending">&#8226;</span> Store coverage not checked</li>`;
+      } else {
+        el.innerHTML = `
+          <li><span class="check-icon fail">&#10007;</span> User not found on ${plat.name}</li>
+          <li><span class="check-icon pending">&#8226;</span> Role not checked</li>
+          <li><span class="check-icon pending">&#8226;</span> Store coverage not checked</li>`;
+      }
+      el.closest('.card').className = 'card error';
+    }
+    scrollDown();
+    await delay(400);
+    await handleVerifyError(code, outcome);
+  }
+}
+
+function simulateVerification(code) {
+  if (code === 'ue' && !S._ueRetried) return 'role_error';
+  return 'success';
+}
+
+async function handleVerifyError(code, outcome) {
+  const plat = S.platforms[code];
+  const remaining = S.platOrder.length - S.platIdx - 1;
+  const nextName = remaining > 0 ? S.platforms[S.platOrder[S.platIdx + 1]].name : null;
+
+  if (outcome === 'role_error') {
+    await botSays(`
+      <div class="card-title">Action Needed</div>
+      <div class="card-body">
+        <strong>What happened:</strong> Role is set to Basic instead of ${plat.role}.<br><br>
+        <strong>How to fix (3 steps):</strong>
+        <div class="step-row"><div class="step-num">1</div><span>Go to ${plat.name} &rarr; Users</span></div>
+        <div class="step-row"><div class="step-num">2</div><span>Find ${plat.email}</span></div>
+        <div class="step-row"><div class="step-num">3</div><span>Change role to <strong>${plat.role}</strong></span></div>
+        <div class="card-divider"></div>
+        <strong>After you fix this:</strong> I'll re-verify instantly. ${nextName ? `Then we move to ${nextName}.` : 'Then we wrap up.'}
+      </div>
+    `, 'warning');
+  } else {
+    await botSays(`
+      <div class="card-title">User Not Found</div>
+      <div class="card-body">
+        <strong>What happened:</strong> Loop's email wasn't found on ${plat.name}.<br><br>
+        <strong>Likely causes:</strong><br>
+        &bull; Invite hasn't been processed yet (can take 1-2 min)<br>
+        &bull; Email was entered with a typo<br><br>
+        <strong>How to fix:</strong>
+        <div class="step-row"><div class="step-num">1</div><span>Open ${plat.name} &rarr; Users</span></div>
+        <div class="step-row"><div class="step-num">2</div><span>Verify the email matches exactly</span></div>
+        <div class="step-row"><div class="step-num">3</div><span>If missing, re-add it with <strong>${plat.role}</strong> role</span></div>
+        <div class="card-divider"></div>
+        <strong>After you fix this:</strong> I'll re-verify. ${nextName ? `Then we move to ${nextName}.` : 'Then we wrap up.'}
+      </div>
+    `, 'warning');
+  }
+
+  showReplies([
+    { label: 'Re-verify', primary: true, value: 'retry' },
+    { label: 'Skip for now', value: 'skip' }
+  ], async (val) => {
+    if (val === 'skip') { await skipPlatform(code); }
+    else { S[`_${code}Retried`] = true; await platStep3(code); }
+  });
+}
+
+function nextPlatform() {
+  S.platIdx++;
+  if (S.platIdx < S.platOrder.length) { startPlatform(); }
+  else { finishTrack(); }
+}
+
+// ═══════════════════════════════════════════════════════
+// CFO TRACK: BUSINESS & BILLING
+// ═══════════════════════════════════════════════════════
+async function startCFOTrack() {
+  S.phase = 'track_overview';
+  updateProgress();
+  setTrackLabel('Business & Billing');
+
+  addSystem('Track B: Business & Billing');
+
+  await botSays(`Great, ${S.userName}! You're handling <strong>Business &amp; Billing</strong> setup.`);
+
+  await botSays(`
+    <div class="card-title">Your Track: Billing Setup</div>
+    <div class="card-body">
+      <div class="step-row"><div class="step-num">1</div><span>Verify billing entity details</span></div>
+      <div class="step-row"><div class="step-num">2</div><span>Confirm products &amp; pricing</span></div>
+      <div class="step-row"><div class="step-num">3</div><span>Set up payment method</span></div>
+      <div class="card-divider"></div>
+      <div style="font-size:12px;color:var(--gray-700)">
+        <strong>~8 min</strong> &middot; most info is pre-filled from your contract<br>
+        <strong>Max 3 actions per step</strong> &middot; just confirm or update
+      </div>
+    </div>
+  `, 'highlight');
+
+  await delay(300);
+  await botSays(`Meanwhile, <strong>${S.contract.adminName}</strong> is handling platform access connections. You don't need to worry about that.`);
+  await delay(200);
+  await botSays(`<strong>Next:</strong> We'll verify your billing entity. Most of this is pre-filled — you just need to confirm.`);
+
+  showReplies([
+    { label: "Let's start!", primary: true },
+    { label: 'What do I need to have ready?' }
+  ], async (val) => {
+    if (val !== "Let's start!") {
+      await botSays(`Just your payment details — a credit card or bank account for ACH. Everything else (entity name, address, products, pricing) is already set up from your contract. You're just confirming it.`);
+      await delay(200);
+      showReplies([{ label: "Got it, let's go!", primary: true }], () => billingStep1());
+    } else {
+      billingStep1();
+    }
+  });
+}
+
+async function billingStep1() {
+  S.phase = 'billing';
+  S.billingStep = 1;
+  updateProgress();
+  updateBillingProgress();
+
+  addSystem('Step 1 of 3: Verify Billing Entity');
+
+  await botSays(`<strong>Step 1 of 3:</strong> Here are your billing details from the contract. Please confirm they're correct.`);
+
+  const c = S.contract;
+  await botSays(`
+    <div class="card-title">Billing Entity</div>
+    <div class="card-body">
+      <div class="data-row"><span class="label">Entity Name</span><span class="value">${c.billingEntity}</span></div>
+      <div class="data-row"><span class="label">Address</span><span class="value">${c.billingAddress}</span></div>
+      <div class="data-row"><span class="label">Segment</span><span class="value">${c.segment}</span></div>
+      <div class="data-row"><span class="label">AP Contact</span><span class="value">${c.apContact.name}</span></div>
+      <div class="data-row"><span class="label">AP Email</span><span class="value">${c.apContact.email}</span></div>
+    </div>
+    <div style="margin-top:8px;font-size:11px;color:var(--gray-500)">Pre-filled from your signed contract</div>
+  `, 'highlight');
+
+  await delay(200);
+  await botSays(`<strong>Next step after this:</strong> confirm your products and pricing.`);
+
+  showReplies([
+    { label: 'Looks correct!', primary: true, value: 'confirm' },
+    { label: 'Something needs updating', value: 'edit' }
+  ], async (val) => {
+    if (val === 'edit') {
+      await handleBillingEdit();
+    } else {
+      await botSays(`Billing entity confirmed.`);
+      await delay(300);
+      askBillingStructure();
+    }
+  });
+}
+
+async function askBillingStructure() {
+  await botSays(`One more thing before we move on — how would you like your <strong>${S.contract.locations} locations</strong> organized for billing?`);
+
+  await botSays(`
+    <div class="card-title">Billing Entity Structure</div>
+    <div class="card-body">
+      <div class="step-row"><div class="step-num" style="background:var(--teal)">A</div><span><strong>All locations under one entity</strong><br><span style="font-size:12px;color:var(--gray-500)">Single invoice to ${S.contract.billingEntity} for all ${S.contract.locations} locations</span></span></div>
+      <div class="step-row"><div class="step-num" style="background:var(--teal)">B</div><span><strong>Each location as its own entity</strong><br><span style="font-size:12px;color:var(--gray-500)">${S.contract.locations} separate invoices — one per location</span></span></div>
+      <div class="step-row"><div class="step-num" style="background:var(--teal)">C</div><span><strong>Custom grouping</strong><br><span style="font-size:12px;color:var(--gray-500)">Group locations into regions, brands, or franchisees</span></span></div>
+    </div>
+  `, 'highlight');
+
+  showReplies([
+    { label: 'All as one entity', primary: true, value: 'single' },
+    { label: 'Each location separate', value: 'per_loc' },
+    { label: 'Custom grouping', value: 'custom' }
+  ], async (val) => {
+    if (val === 'single') {
+      S._billingStructure = 'single';
+      await botSays(`
+        <div class="card-title">Single Entity Confirmed</div>
+        <div class="card-body">
+          All ${S.contract.locations} locations will be billed under <strong>${S.contract.billingEntity}</strong>. One consolidated invoice per billing cycle.
+        </div>
+      `, 'success');
+      await delay(200);
+      await botSays(`<strong>Next:</strong> confirm products &amp; pricing.`);
+      showReplies([{ label: 'Continue', primary: true }], () => billingStep2());
+
+    } else if (val === 'per_loc') {
+      S._billingStructure = 'per_location';
+      await botSays(`
+        <div class="card-title">Per-Location Billing Confirmed</div>
+        <div class="card-body">
+          Each of your ${S.contract.locations} locations will receive its own invoice. All invoices go to <strong>${S.contract.apContact.name}</strong> (${S.contract.apContact.email}).
+          <div class="card-divider"></div>
+          <div style="font-size:12px;color:var(--gray-500)">Our billing team will set up the ${S.contract.locations} entities within 1 business day.</div>
+        </div>
+      `, 'success');
+      await delay(200);
+      await botSays(`<strong>Next:</strong> confirm products &amp; pricing.`);
+      showReplies([{ label: 'Continue', primary: true }], () => billingStep2());
+
+    } else {
+      S._billingStructure = 'custom';
+      await botSays(`
+        <div class="card-title">Custom Grouping</div>
+        <div class="card-body">
+          Our finance team will schedule a call to set up your custom billing groups — regions, brands, franchisees, or however your organization is structured.
+          <div class="card-divider"></div>
+          <div class="step-row"><div class="step-num">1</div><span>Finance team emails <strong>${S.contract.apContact.name}</strong> within 1 business day</span></div>
+          <div class="step-row"><div class="step-num">2</div><span>Quick call to map locations into groups</span></div>
+          <div class="step-row"><div class="step-num">3</div><span>Billing entities created &amp; invoicing configured</span></div>
+          <div class="card-divider"></div>
+          <div style="font-size:12px;color:var(--gray-500)"><strong>Meanwhile:</strong> you can continue with products &amp; payment setup — grouping doesn't block that.</div>
+        </div>
+      `, 'warning');
+      await delay(200);
+      await botSays(`<strong>Next:</strong> let's confirm products &amp; pricing while that gets scheduled.`);
+      showReplies([{ label: 'Continue', primary: true }], () => billingStep2());
+    }
+  });
+}
+
+async function handleBillingEdit() {
+  await botSays(`No problem. What needs to change?`);
+
+  showReplies([
+    { label: 'Entity name', value: 'name' },
+    { label: 'Address', value: 'address' },
+    { label: 'AP Contact', value: 'ap' },
+    { label: 'Other', value: 'other' }
+  ], async (val) => {
+    S._billingEntityEdited = true;
+
+    if (val === 'other') {
+      await botSays(`Type what needs to change and I'll flag it for our billing team.`);
+      $('#userInput').focus();
+      $('#userInput').placeholder = 'Describe the change...';
+      waitForInput(async (text) => {
+        await botSays(`
+          <div class="card-title">Change Flagged</div>
+          <div class="card-body">
+            <strong>Your note:</strong> "${text}"<br><br>
+            I've flagged this for our billing team. They'll update it within 1 business day and confirm via email.
+          </div>
+          <div style="margin-top:8px;font-size:11px;color:var(--gray-500)"><strong>Next:</strong> Let's continue — this change won't block anything.</div>
+        `, 'warning');
+        await delay(300);
+        showReplies([{ label: 'Continue', primary: true }], () => askBillingStructure());
+      });
+    } else {
+      const fieldMap = { name: 'entity name', address: 'address', ap: 'AP contact info' };
+      await botSays(`Type the correct ${fieldMap[val]}:`);
+      $('#userInput').focus();
+      $('#userInput').placeholder = `Enter new ${fieldMap[val]}...`;
+      waitForInput(async (text) => {
+        await botSays(`
+          <div class="card-title">Update Noted</div>
+          <div class="card-body">
+            <strong>${fieldMap[val].charAt(0).toUpperCase() + fieldMap[val].slice(1)}</strong> will be updated to: <strong>${text}</strong><br><br>
+            Our billing team will process this within 1 business day.
+          </div>
+          <div style="margin-top:8px;font-size:11px;color:var(--gray-500)"><strong>Next:</strong> billing entity structure.</div>
+        `, 'success');
+        await delay(300);
+        showReplies([{ label: 'Continue', primary: true }], () => askBillingStructure());
+      });
+    }
+  });
+}
+
+async function billingStep2() {
+  S.billingStep = 2;
+  updateBillingProgress();
+
+  addSystem('Step 2 of 3: Confirm Products & Pricing');
+
+  await botSays(`<strong>Step 2 of 3:</strong> Here are your contracted products and pricing.`);
+
+  const c = S.contract;
+  const mrr = c.totalPPL * c.locations;
+  const acv = mrr * 12;
+
+  // Build per-product detail sections
+  let prodDetail = '';
+  c.products.forEach(p => {
+    prodDetail += `
+      <div style="margin-top:10px;padding:10px;background:rgba(0,0,0,0.03);border-radius:6px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <span class="product-tag">${p.name}</span>
+          <strong>$${p.ppl}/loc/mo</strong>
+        </div>
+        <div style="font-size:11px;color:var(--gray-500)">
+          <div>Datastreams: ${p.datastreams.join(', ')}</div>
+          <div>Alerts & Reports: ${p.alerts.join(', ')}</div>
+          <div>Workflows: ${p.workflows.join(', ')}</div>
+          <div>Connectors: ${p.connectors.join(', ')}</div>
+          ${p.note ? `<div style="color:var(--teal);margin-top:3px">${p.note}</div>` : ''}
+        </div>
+      </div>`;
+  });
+
+  await botSays(`
+    <div class="card-title">Products &amp; Pricing</div>
+    <div class="card-body">
+      <div class="product-tags">${c.products.map(p => `<span class="product-tag">${p.name}</span>`).join('')}</div>
+      ${prodDetail}
+      <div class="card-divider"></div>
+      <div class="data-row total"><span class="label">Total PPL</span><span class="value">$${c.totalPPL}/loc/mo</span></div>
+      <div class="data-row"><span class="label">Contracted Locations</span><span class="value">${c.locations}</span></div>
+      <div class="data-row"><span class="label">Monthly (MRR)</span><span class="value">$${mrr.toLocaleString()}</span></div>
+      <div class="data-row"><span class="label">ACV</span><span class="value">$${acv.toLocaleString()}</span></div>
+      <div class="data-row"><span class="label">Payment Terms</span><span class="value">${c.paymentTerms}</span></div>
+      <div class="data-row"><span class="label">Contract Term</span><span class="value">${c.term}${c.autoRenew ? ' (auto-renew)' : ''}</span></div>
+    </div>
+    <div style="margin-top:8px;font-size:11px;color:var(--gray-500)">Pre-filled from your signed contract</div>
+  `, 'highlight');
+
+  await delay(200);
+  await botSays(`<strong>Next step after this:</strong> set up your payment method so invoicing can begin.`);
+
+  showReplies([
+    { label: 'Confirmed!', primary: true, value: 'confirm' },
+    { label: "This doesn't look right", value: 'dispute' }
+  ], async (val) => {
+    if (val === 'dispute') {
+      await botSays(`
+        <div class="card-title">Need Changes?</div>
+        <div class="card-body">
+          Contract terms require review by your account manager. Here's what to do:
+          <div class="step-row"><div class="step-num">1</div><span>Note what looks incorrect</span></div>
+          <div class="step-row"><div class="step-num">2</div><span>Your account manager will reach out within 1 business day</span></div>
+          <div class="step-row"><div class="step-num">3</div><span>Updated terms will reflect in your billing automatically</span></div>
+          <div class="card-divider"></div>
+          <strong>Meanwhile:</strong> You can still set up payment — pricing changes will apply to future invoices.
+        </div>
+      `, 'warning');
+      showReplies([
+        { label: 'Continue to payment', primary: true },
+        { label: "I'll come back later" }
+      ], async (val2) => {
+        if (val2 === "I'll come back later") {
+          await botSays(`No problem — your progress is saved. Come back anytime to finish payment setup.`);
+        } else {
+          billingStep3();
+        }
+      });
+    } else {
+      await botSays(`Products and pricing confirmed.`);
+      await delay(200);
+      billingStep3();
+    }
+  });
+}
+
+async function billingStep3() {
+  S.billingStep = 3;
+  updateBillingProgress();
+
+  addSystem('Step 3 of 3: Payment Method');
+
+  await botSays(`<strong>Step 3 of 3:</strong> Let's set up your payment method.`);
+  await botSays(`How would you like to pay?`);
+
+  showReplies([
+    { label: 'Credit Card / ACH', primary: true, value: 'stripe' },
+    { label: 'Wire Transfer', value: 'wire' }
+  ], async (val) => {
+    if (val === 'wire') {
+      await botSays(`
+        <div class="card-title">Wire Transfer Details</div>
+        <div class="card-body">
+          Our billing team will email wire instructions to <strong>${S.contract.apContact.email}</strong> within 1 business day.
+          <div class="card-divider"></div>
+          <div class="data-row"><span class="label">Reference</span><span class="value">${S.contract.billingEntity}</span></div>
+        </div>
+        <div style="margin-top:8px;font-size:11px;color:var(--gray-500)"><strong>Next:</strong> Once received, invoicing begins on your next billing cycle.</div>
+      `, 'highlight');
+      S._paymentCompleted = true;
+      updateBillingProgress();
+      await delay(300);
+      showReplies([{ label: 'Continue', primary: true }], () => finishTrack());
+    } else {
+      await botSays(`
+        <div class="card-title">Secure Payment Setup</div>
+        <div class="card-body">
+          <div class="step-row"><div class="step-num">1</div><span>Tap the button below to open Stripe's secure payment page</span></div>
+          <div class="step-row"><div class="step-num">2</div><span>Enter your card or bank details</span></div>
+          <div class="step-row"><div class="step-num">3</div><span>Come back here and tap "Done"</span></div>
+          <div class="card-divider"></div>
+          <div style="text-align:center;padding:8px 0">
+            <span style="display:inline-block;padding:12px 28px;background:var(--navy);color:#fff;border-radius:8px;font-weight:600;font-size:14px;cursor:pointer" onclick="this.textContent='Link opened (simulated)';">Open Stripe Checkout</span>
+          </div>
+        </div>
+        <div style="margin-top:8px;font-size:11px;color:var(--gray-500)">Powered by Stripe &middot; 256-bit encryption &middot; Loop never sees your card details</div>
+      `, 'highlight');
+
+      await delay(200);
+      showReplies([
+        { label: 'Done!', primary: true, value: 'done' },
+        { label: "Link didn't work", value: 'error' },
+        { label: "I'll do this later", value: 'skip' }
+      ], async (val2) => {
+        if (val2 === 'error') {
+          await botSays(`
+            <div class="card-title">Alternative Options</div>
+            <div class="card-body">
+              <strong>What happened:</strong> The payment link didn't open properly.<br><br>
+              <strong>How to fix:</strong>
+              <div class="step-row"><div class="step-num">1</div><span>Check that pop-ups aren't blocked in your browser</span></div>
+              <div class="step-row"><div class="step-num">2</div><span>Try again, or switch to wire transfer</span></div>
+              <div class="card-divider"></div>
+              <strong>After this:</strong> Once payment is set, we'll wrap up with a summary.
+            </div>
+          `, 'warning');
+          showReplies([
+            { label: 'Try again', primary: true, value: 'retry' },
+            { label: 'Use wire transfer', value: 'wire' }
+          ], async (val3) => {
+            if (val3 === 'wire') {
+              await botSays(`Our billing team will email wire instructions to <strong>${S.contract.apContact.email}</strong> within 1 business day.`);
+              S._paymentCompleted = true;
+              updateBillingProgress();
+              await delay(200);
+              showReplies([{ label: 'Continue', primary: true }], () => finishTrack());
+            } else {
+              await botSays(`Try tapping "Open Stripe Checkout" above once more. Let me know when you're done.`);
+              showReplies([
+                { label: 'Done!', primary: true, value: 'done' },
+                { label: 'Skip for now', value: 'skip' }
+              ], async (val4) => {
+                if (val4 === 'skip') {
+                  await botSays(`No problem — you'll receive an email with the payment link. Complete it anytime before your first invoice.`);
+                  await delay(200);
+                  finishTrack();
+                } else {
+                  await verifyPayment();
+                }
+              });
+            }
+          });
+        } else if (val2 === 'skip') {
+          await botSays(`No problem — you'll receive an email with the payment link. Complete it anytime before your first invoice. <strong>Next:</strong> Let's review your summary.`);
+          await delay(200);
+          finishTrack();
+        } else {
+          await verifyPayment();
+        }
+      });
+    }
+  });
+}
+
+async function verifyPayment() {
+  await botSays(`Verifying payment method...`);
+
+  const checkId = `pay-${Date.now()}`;
+  await botSays(`
+    <div class="card-body">
+      <ul class="checklist" id="${checkId}">
+        <li><span class="check-icon running"><span class="spinner spinner-sm"></span></span> Checking with Stripe...</li>
+        <li><span class="check-icon pending">&#8226;</span> Validating payment method</li>
+        <li><span class="check-icon pending">&#8226;</span> Setting up invoicing</li>
+      </ul>
+    </div>
+  `, 'highlight');
+
+  await delay(900);
+  const el = $(`#${checkId}`);
+  if (el) {
+    el.innerHTML = `
+      <li><span class="check-icon done">&#10003;</span> Stripe confirmed</li>
+      <li><span class="check-icon running"><span class="spinner spinner-sm"></span></span> Validating payment method...</li>
+      <li><span class="check-icon pending">&#8226;</span> Setting up invoicing</li>`;
+  }
+  await delay(700);
+  if (el) {
+    el.innerHTML = `
+      <li><span class="check-icon done">&#10003;</span> Stripe confirmed</li>
+      <li><span class="check-icon done">&#10003;</span> Payment method valid</li>
+      <li><span class="check-icon done">&#10003;</span> Invoicing activated</li>`;
+    el.closest('.card').className = 'card success';
+  }
+
+  S._paymentCompleted = true;
+  updateBillingProgress();
+
+  await delay(400);
+  await botSays(`Payment method verified and linked to your billing account!`);
+  await delay(200);
+  showReplies([{ label: 'See summary', primary: true }], () => finishTrack());
+}
+
+// ═══════════════════════════════════════════════════════
+// SHARED: SUMMARY & NEXT STEPS
+// ═══════════════════════════════════════════════════════
+async function finishTrack() {
+  S.phase = 'summary';
+  updateProgress();
+  $('#progFab').classList.remove('show');
+
+  addSystem('Summary');
+
+  if (S.role === 'admin') {
+    // Admin track summary
+    const done = S.platOrder.filter(c => S.platforms[c].status === 'done');
+    const skipped = S.platOrder.filter(c => S.platforms[c].status !== 'done');
+    const totalStores = S.totalPlatformStores;
+    const pct = Math.round((S.accessStores / totalStores) * 100);
+    const threshold = Math.ceil(totalStores * S.accessThreshold);
+
+    let summaryHtml = '<div class="card-title">Access Onboarding Summary</div><div class="card-body">';
+    S.platOrder.forEach(code => {
+      const p = S.platforms[code];
+      const icon = p.status === 'done' ? '<span style="color:var(--green)">&#10003;</span>' : '<span style="color:var(--amber)">&#9679;</span>';
+      const label = p.status === 'done' ? `${p.stores} stores connected` : 'Pending';
+      summaryHtml += `<div style="display:flex;align-items:center;gap:8px;padding:5px 0"><span class="plat-pill ${code}">${p.name}</span>${icon} <span style="font-size:12px;color:var(--gray-500)">${label}</span></div>`;
+    });
+    summaryHtml += `<div class="card-divider"></div>`;
+    summaryHtml += `<div class="data-row"><span class="label">Total Stores Verified</span><span class="value">${S.accessStores}/${totalStores} (${pct}%)</span></div>`;
+    summaryHtml += `<div class="data-row"><span class="label">Target (${threshold} stores)</span><span class="value">${S.accessStores >= threshold ? '<span style="color:var(--green)">Reached</span>' : `${threshold - S.accessStores} stores remaining`}</span></div>`;
+    summaryHtml += '</div>';
+    await botSays(summaryHtml, 'success');
+
+    if (skipped.length > 0) {
+      await delay(200);
+      await botSays(`${skipped.length} platform${skipped.length > 1 ? 's' : ''} still need${skipped.length === 1 ? 's' : ''} setup. You'll get a reminder, or come back anytime to finish.`);
+    }
+
+    await delay(300);
+    await botSays(`
+      <div class="card-title">Next Up: Billing Setup</div>
+      <div class="card-body">
+        We'll now reach out to <strong>${S.contract.signeeName}</strong> (${S.contract.apContact.email}) to complete the billing side — entity confirmation, products &amp; pricing review, and payment setup.
+        <div class="card-divider"></div>
+        <div style="font-size:12px;color:var(--gray-500)">This runs in parallel — no waiting needed on your end.</div>
+      </div>
+    `, 'navy-card');
+  } else {
+    // CFO track summary
+    const c = S.contract;
+    const mrr = c.totalPPL * c.locations;
+    let summaryHtml = `<div class="card-title">Billing Setup Summary</div><div class="card-body">`;
+    summaryHtml += `<div class="data-row"><span class="label">Billing Entity</span><span class="value">${c.billingEntity}${S._billingEntityEdited ? ' <span style="color:var(--amber)">(update pending)</span>' : ' &#10003;'}</span></div>`;
+    const structLabel = S._billingStructure === 'single' ? 'All locations under one entity' : S._billingStructure === 'per_location' ? `${c.locations} separate entities` : 'Custom grouping (call scheduled)';
+    summaryHtml += `<div class="data-row"><span class="label">Structure</span><span class="value">${structLabel}${S._billingStructure === 'custom' ? ' <span style="color:var(--amber)">&#9679;</span>' : ' &#10003;'}</span></div>`;
+    summaryHtml += `<div class="data-row"><span class="label">Products</span><span class="value">${c.products.map(p=>p.name).join(' + ')} &#10003;</span></div>`;
+    summaryHtml += `<div class="data-row"><span class="label">MRR</span><span class="value">$${mrr.toLocaleString()}/mo ($${c.totalPPL}/loc x ${c.locations} locs)</span></div>`;
+    summaryHtml += `<div class="data-row"><span class="label">Payment Method</span><span class="value">${S._paymentCompleted ? '<span style="color:var(--green)">Verified &#10003;</span>' : '<span style="color:var(--amber)">Pending</span>'}</span></div>`;
+    summaryHtml += `<div class="data-row"><span class="label">AP Contact</span><span class="value">${c.apContact.name} &#10003;</span></div>`;
+    summaryHtml += '</div>';
+    await botSays(summaryHtml, 'success');
+  }
+
+  await delay(400);
+  S.phase = 'next_steps';
+  await showNextSteps();
+}
+
+async function showNextSteps() {
+  const otherTrack = S.role === 'admin'
+    ? `<strong>${S.contract.signeeName}</strong> is handling billing setup separately.`
+    : `<strong>${S.contract.adminName}</strong> is handling platform access separately.`;
+
+  await botSays(`${otherTrack} Once both tracks are complete, here's what happens:`);
+
+  await botSays(`
+    <div class="card-title">What Happens Next</div>
+    <div class="card-body">
+      <div class="step-row"><div class="step-num" style="background:var(--navy)">1</div><span><strong>We verify everything</strong> — our team checks all connections and billing setup (1-2 business days)</span></div>
+      <div class="step-row"><div class="step-num" style="background:var(--navy)">2</div><span><strong>Your CS manager reaches out</strong> — dedicated point of contact for your account</span></div>
+      <div class="step-row"><div class="step-num" style="background:var(--navy)">3</div><span><strong>Product onboarding begins</strong> — guided setup for your contracted products</span></div>
+      <div class="card-divider"></div>
+      <div style="font-size:12px;color:var(--gray-500)">No action needed from you — we'll reach out when it's time.</div>
+    </div>
+  `, 'navy-card');
+
+  await delay(400);
+  await botSays(`After CS kick-off, you'll unlock self-serve setup for your products:`);
+
+  await botSays(`
+    <div class="card-title">Step 9: Product Onboarding (Coming Soon)</div>
+    <div class="card-body">
+      <div class="step-row"><div class="step-num" style="background:var(--teal)">1</div><span><strong>Measure</strong> — P&amp;L reporting, revenue finance &amp; JE push</span></div>
+      <div class="step-row"><div class="step-num" style="background:var(--teal)">2</div><span><strong>Protect</strong> — Operations alerts, dispute recovery &amp; Samantha AI</span></div>
+      <div class="step-row"><div class="step-num" style="background:var(--teal)">3</div><span><strong>Grow</strong> — Campaign ops, marketing analytics &amp; plan generation</span></div>
+      <div class="step-row"><div class="step-num" style="background:var(--teal)">4</div><span><strong>Connect</strong> — Unlimited connectors beyond 3PD platforms</span></div>
+      <div class="step-row"><div class="step-num" style="background:var(--teal)">5</div><span><strong>AI BI</strong> — AI-powered analytics across all modules</span></div>
+      <div class="card-divider"></div>
+      <div style="font-size:12px;color:var(--gray-500)">Same chat-first experience — guided setup, no guesswork.</div>
+    </div>
+  `, 'highlight');
+
+  await delay(300);
+
+  // Set celebration messages
+  if (S.role === 'admin') {
+    $('#celebTitle').textContent = 'Access Onboarding Complete!';
+    $('#celebMsg').textContent = 'Your platforms are connected and verified.';
+  } else {
+    $('#celebTitle').textContent = 'Billing Setup Complete!';
+    $('#celebMsg').textContent = 'Your payment and billing are configured.';
+  }
+  $('#celebSub').textContent = `Verification: 1-2 days \u2192 CS manager intro \u2192 Product onboarding`;
+
+  showReplies([
+    { label: 'Looks great!', primary: true },
+    { label: 'I have a question' }
+  ], async (val) => {
+    if (val === 'I have a question') {
+      await botSays(`Sure! Type your question below. You can also reach your CS manager once kick-off begins.`);
+      enableFreeChat();
+    } else {
+      S.phase = 'done';
+      updateProgress();
+      $('#celebration').classList.add('show');
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// FREE CHAT
+// ═══════════════════════════════════════════════════════
+function enableFreeChat() {
+  const handler = async () => {
+    const v = $('#userInput').value.trim();
+    if (!v) return;
+    addMsg(v, 'user');
+    $('#userInput').value = '';
+
+    const l = v.toLowerCase();
+    if (l.includes('how long') || l.includes('time') || l.includes('when')) {
+      await botSays(`Our team verifies all connections — that takes 1-2 business days. Then your dedicated CS manager reaches out, and product onboarding starts from there.`);
+    } else if (l.includes('store') || l.includes('location') || l.includes('missing')) {
+      await botSays(`If you're seeing fewer stores than expected, it's usually because some locations aren't linked to the admin account on that platform. Your CS manager will reconcile store lists during kick-off. We need ${Math.ceil(S.totalPlatformStores * 0.8)} of ${S.totalPlatformStores} total stores connected to get you fully up and running.`);
+    } else if (l.includes('role') || l.includes('permission') || l.includes('access')) {
+      await botSays(`Loop needs admin-level access on each platform to pull data across all stores. This is read-only — we never make changes to your delivery accounts. DoorDash requires Business Admin, Uber Eats requires Full Access, and Grubhub requires Admin (not Basic).`);
+    } else if (l.includes('billing') || l.includes('invoice') || l.includes('payment') || l.includes('price')) {
+      const mrr = S.contract.totalPPL * S.contract.locations;
+      await botSays(`Your products (${S.contract.products.map(p=>p.name).join(' + ')}) are billed at $${S.contract.totalPPL}/loc/month for ${S.contract.locations} locations = $${mrr.toLocaleString()}/month MRR. All pricing is per-location, no variable fees. Invoices go to ${S.contract.apContact.name} on ${S.contract.paymentTerms} terms.`);
+    } else if (l.includes('product') || l.includes('measure') || l.includes('protect') || l.includes('grow') || l.includes('connect') || l.includes('samantha')) {
+      await botSays(`Product onboarding (Measure, Protect, Grow, Connect, AI BI) starts after CS kick-off. It follows the same chat-first guided experience. Your contracted products are: ${S.contract.products.map(p=>p.name).join(' + ')}. Each product includes specific datastreams, alerts, workflows, and connectors.`);
+    } else if (l.includes('contract') || l.includes('term') || l.includes('cancel')) {
+      await botSays(`Your contract is ${S.contract.term} with ${S.contract.autoRenew ? 'auto-renewal' : 'manual renewal'}, signed ${S.contract.signedDate}. For contract questions, your account manager can help — they'll be looped in at CS kick-off.`);
+    } else if (l.includes('80%') || l.includes('threshold') || l.includes('target') || l.includes('how many')) {
+      await botSays(`We need ${Math.ceil(S.totalPlatformStores * 0.8)}+ of your ${S.totalPlatformStores} total stores connected across all platforms to get you fully activated. You have ${S.contract.locations} locations across DoorDash (${S.platforms.dd.stores}), Uber Eats (${S.platforms.ue.stores}), and Grubhub (${S.platforms.gh.stores}). Once we hit that target, our team verifies everything and your CS manager takes over.`);
+    } else {
+      await botSays(`Good question! I'll flag this for your CS manager to address during kick-off. Is there anything else?`);
+    }
+
+    showReplies([
+      { label: "That's all, thanks!", primary: true },
+      { label: 'Another question' }
+    ], async (val) => {
+      if (val === 'Another question') {
+        await botSays(`Go ahead — type your question.`);
+        enableFreeChat();
+      } else {
+        S.phase = 'done';
+        updateProgress();
+        $('#celebration').classList.add('show');
+      }
+    });
+  };
+
+  $('#sendBtn').onclick = handler;
+  $('#userInput').onkeydown = e => { if (e.key === 'Enter') handler(); };
+}
+
+// ═══════════════════════════════════════════════════════
+// UTILITIES
+// ═══════════════════════════════════════════════════════
+function copyEmail(el, email) {
+  navigator.clipboard.writeText(email).then(() => {
+    el.querySelector('.copy-field-btn').textContent = 'COPIED!';
+    el.style.borderColor = 'var(--green)';
+    setTimeout(() => {
+      el.querySelector('.copy-field-btn').textContent = 'TAP TO COPY';
+      el.style.borderColor = '';
+    }, 2000);
+  }).catch(() => {
+    const range = document.createRange();
+    range.selectNode(el.querySelector('.copy-field-text'));
+    window.getSelection().removeAllRanges();
+    window.getSelection().addRange(range);
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════
+startWelcome();
+</script>
+</body>
+</html>

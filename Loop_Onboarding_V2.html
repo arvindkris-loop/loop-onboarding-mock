@@ -1,0 +1,1224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Loop - Self-Serve Onboarding</title>
+<style>
+:root {
+  --navy: #09234b;
+  --navy-light: #0e3066;
+  --teal: #196e82;
+  --teal-light: #1a8a9e;
+  --mint: #84e1cc;
+  --green: #07bc0c;
+  --green-bg: #e8f9e8;
+  --amber: #f59e0b;
+  --amber-bg: #fef3c7;
+  --red: #e74c3c;
+  --red-bg: #fde8e8;
+  --bg: #f0f5f8;
+  --white: #ffffff;
+  --gray-100: #f7f8fa;
+  --gray-200: #e8ecf1;
+  --gray-300: #d1d5db;
+  --gray-500: #6b7280;
+  --gray-700: #374151;
+  --radius: 16px;
+  --radius-sm: 10px;
+  --radius-xs: 6px;
+  --shadow: 0 2px 12px rgba(9,35,75,0.08);
+  --shadow-lg: 0 8px 32px rgba(9,35,75,0.12);
+  --font: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, sans-serif;
+  --max-w: 480px;
+  --dd-color: #ff3008;
+  --ue-color: #06c167;
+  --gh-color: #e3342f;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; overflow: hidden; }
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--navy);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* ── App Shell ── */
+#app {
+  width: 100%;
+  max-width: var(--max-w);
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--white);
+  position: relative;
+  overflow: hidden;
+}
+
+/* ── Top Bar ── */
+.topbar {
+  flex-shrink: 0;
+  background: var(--navy);
+  color: var(--white);
+  padding: 14px 16px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 10;
+}
+.topbar-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.topbar-logo {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+.topbar-logo span { color: var(--mint); }
+.topbar-time {
+  font-size: 12px;
+  color: var(--mint);
+  opacity: 0.9;
+}
+.topbar-steps {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+.topbar-step {
+  height: 4px;
+  flex: 1;
+  border-radius: 2px;
+  background: rgba(255,255,255,0.15);
+  transition: background 0.4s;
+}
+.topbar-step.done { background: var(--mint); }
+.topbar-step.active { background: var(--teal-light); }
+
+/* ── Chat Area ── */
+.chat-area {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ── Messages ── */
+.msg {
+  max-width: 88%;
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  font-size: 15px;
+  line-height: 1.5;
+  animation: fadeUp 0.3s ease;
+  word-wrap: break-word;
+}
+.msg.bot {
+  align-self: flex-start;
+  background: var(--gray-100);
+  border-bottom-left-radius: 4px;
+  color: var(--navy);
+}
+.msg.user {
+  align-self: flex-end;
+  background: var(--navy);
+  color: var(--white);
+  border-bottom-right-radius: 4px;
+}
+.msg.system {
+  align-self: center;
+  background: transparent;
+  color: var(--gray-500);
+  font-size: 12px;
+  text-align: center;
+  padding: 4px 8px;
+}
+
+/* ── Typing Indicator ── */
+.typing {
+  align-self: flex-start;
+  display: flex;
+  gap: 4px;
+  padding: 12px 18px;
+  background: var(--gray-100);
+  border-radius: var(--radius);
+  border-bottom-left-radius: 4px;
+}
+.typing span {
+  width: 7px; height: 7px;
+  background: var(--gray-300);
+  border-radius: 50%;
+  animation: bounce 1.2s infinite;
+}
+.typing span:nth-child(2) { animation-delay: 0.15s; }
+.typing span:nth-child(3) { animation-delay: 0.3s; }
+
+/* ── Cards inside chat ── */
+.card {
+  background: var(--white);
+  border: 1.5px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  margin-top: 4px;
+}
+.card.highlight {
+  border-color: var(--teal);
+  background: #f0fafb;
+}
+.card.success {
+  border-color: var(--green);
+  background: var(--green-bg);
+}
+.card.warning {
+  border-color: var(--amber);
+  background: var(--amber-bg);
+}
+.card.error {
+  border-color: var(--red);
+  background: var(--red-bg);
+}
+
+.card-title {
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.card-body {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--gray-700);
+}
+
+/* Platform pill */
+.plat-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.plat-pill.dd { background: #fff0ed; color: var(--dd-color); }
+.plat-pill.ue { background: #e6f9ef; color: var(--ue-color); }
+.plat-pill.gh { background: #fde8e8; color: var(--gh-color); }
+
+/* Step indicator inside card */
+.step-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  font-size: 13px;
+}
+.step-num {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: var(--teal);
+  color: var(--white);
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.step-num.done { background: var(--green); }
+.step-num.pending { background: var(--gray-300); }
+
+/* Copyable field */
+.copy-field {
+  display: flex;
+  align-items: center;
+  background: var(--gray-100);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-xs);
+  padding: 10px 12px;
+  gap: 8px;
+  cursor: pointer;
+  transition: border-color 0.2s;
+  margin: 6px 0;
+}
+.copy-field:active { border-color: var(--teal); }
+.copy-field-text {
+  flex: 1;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 13px;
+  color: var(--navy);
+  user-select: all;
+}
+.copy-field-btn {
+  font-size: 11px;
+  color: var(--teal);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ── Quick Replies ── */
+.replies {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 6px 0;
+  animation: fadeUp 0.3s ease;
+}
+.reply-btn {
+  padding: 10px 16px;
+  border-radius: 20px;
+  border: 1.5px solid var(--teal);
+  background: var(--white);
+  color: var(--teal);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.reply-btn:active {
+  background: var(--teal);
+  color: var(--white);
+  transform: scale(0.97);
+}
+.reply-btn.primary {
+  background: var(--teal);
+  color: var(--white);
+  border-color: var(--teal);
+}
+.reply-btn.primary:active {
+  background: var(--teal-light);
+}
+
+/* ── Bottom Input ── */
+.input-bar {
+  flex-shrink: 0;
+  padding: 10px 16px;
+  padding-bottom: max(10px, env(safe-area-inset-bottom));
+  background: var(--white);
+  border-top: 1px solid var(--gray-200);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 10;
+}
+.input-bar input {
+  flex: 1;
+  padding: 12px 16px;
+  border-radius: 24px;
+  border: 1.5px solid var(--gray-200);
+  font-size: 15px;
+  font-family: var(--font);
+  color: var(--navy);
+  outline: none;
+  transition: border-color 0.2s;
+  background: var(--gray-100);
+}
+.input-bar input:focus { border-color: var(--teal); background: var(--white); }
+.input-bar input::placeholder { color: var(--gray-300); }
+.send-btn {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: var(--navy);
+  border: none;
+  color: var(--white);
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+.send-btn:active { background: var(--teal); }
+
+/* ── Progress Summary (floating) ── */
+.progress-fab {
+  position: absolute;
+  top: 80px;
+  right: 12px;
+  background: var(--white);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-lg);
+  padding: 10px 14px;
+  z-index: 20;
+  display: none;
+  min-width: 180px;
+  animation: fadeUp 0.2s ease;
+}
+.progress-fab.show { display: block; }
+.progress-fab h4 {
+  font-size: 12px;
+  color: var(--gray-500);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+.progress-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 0;
+  font-size: 13px;
+}
+.progress-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.progress-dot.done { background: var(--green); }
+.progress-dot.active { background: var(--amber); }
+.progress-dot.pending { background: var(--gray-300); }
+
+/* ── Celebration overlay ── */
+.celebration {
+  position: absolute;
+  inset: 0;
+  background: rgba(9,35,75,0.85);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  animation: fadeIn 0.4s ease;
+  display: none;
+  text-align: center;
+  padding: 32px;
+}
+.celebration.show { display: flex; }
+.celebration h2 {
+  color: var(--white);
+  font-size: 28px;
+  margin-bottom: 8px;
+}
+.celebration p {
+  color: var(--mint);
+  font-size: 16px;
+  line-height: 1.5;
+  margin-bottom: 24px;
+}
+.celebration .cta {
+  padding: 14px 32px;
+  background: var(--mint);
+  color: var(--navy);
+  border: none;
+  border-radius: 24px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* ── Animations ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes bounce {
+  0%, 60%, 100% { transform: translateY(0); }
+  30% { transform: translateY(-4px); }
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Spinner */
+.spinner {
+  width: 16px; height: 16px;
+  border: 2px solid var(--gray-200);
+  border-top-color: var(--teal);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* ── Checklist inside card ── */
+.checklist { list-style: none; padding: 0; }
+.checklist li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+  font-size: 13px;
+}
+.check-icon {
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  flex-shrink: 0;
+}
+.check-icon.done { background: var(--green); color: #fff; }
+.check-icon.pending { background: var(--gray-200); color: var(--gray-500); }
+.check-icon.running { background: var(--amber); color: #fff; }
+
+/* ── Responsive desktop ── */
+@media (min-width: 481px) {
+  #app {
+    height: 90vh;
+    max-height: 844px;
+    border-radius: 24px;
+    box-shadow: var(--shadow-lg);
+    margin: 20px auto;
+  }
+  .topbar { border-radius: 24px 24px 0 0; }
+}
+
+/* ── Safe area for notch phones ── */
+@supports (padding-top: env(safe-area-inset-top)) {
+  .topbar { padding-top: calc(14px + env(safe-area-inset-top)); }
+}
+
+/* Hide scrollbar on mobile */
+.chat-area::-webkit-scrollbar { width: 0; }
+
+/* Inline link style */
+.inline-link {
+  color: var(--teal);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* Platform status row */
+.plat-status-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 4px 0;
+}
+.plat-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: var(--radius-xs);
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid var(--gray-200);
+  background: var(--white);
+}
+.plat-status .dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+}
+</style>
+</head>
+<body>
+
+<div id="app">
+  <!-- Top Bar -->
+  <div class="topbar">
+    <div class="topbar-row">
+      <div class="topbar-logo">Loop<span>AI</span></div>
+      <div class="topbar-time" id="timeEst">~12 min</div>
+    </div>
+    <div class="topbar-steps" id="topSteps">
+      <div class="topbar-step" data-s="0"></div>
+      <div class="topbar-step" data-s="1"></div>
+      <div class="topbar-step" data-s="2"></div>
+      <div class="topbar-step" data-s="3"></div>
+      <div class="topbar-step" data-s="4"></div>
+    </div>
+  </div>
+
+  <!-- Progress FAB -->
+  <div class="progress-fab" id="progFab">
+    <h4>Progress</h4>
+    <div id="progList"></div>
+  </div>
+
+  <!-- Chat Area -->
+  <div class="chat-area" id="chat"></div>
+
+  <!-- Input Bar -->
+  <div class="input-bar">
+    <input type="text" id="userInput" placeholder="Type a message..." autocomplete="off">
+    <button class="send-btn" id="sendBtn" aria-label="Send">&#9654;</button>
+  </div>
+
+  <!-- Celebration -->
+  <div class="celebration" id="celebration">
+    <h2>You're all set!</h2>
+    <p>Access onboarding complete. Your platforms are connected and verified.</p>
+    <button class="cta" onclick="location.reload()">Back to Dashboard</button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════
+const S = {
+  phase: 'welcome',   // welcome | overview | platform | verify | done
+  platIdx: 0,         // which platform we're on
+  platStep: 0,        // step within platform flow
+  platforms: {
+    dd: { name: 'DoorDash', code: 'dd', status: 'pending', email: 'onboarding+acme@loopkitchen.com', role: 'Business Admin', color: '#ff3008', stores: 142 },
+    ue: { name: 'Uber Eats', code: 'ue', status: 'pending', email: 'onboarding+acme@loopkitchen.com', role: 'Full Access', color: '#06c167', stores: 138 },
+    gh: { name: 'Grubhub', code: 'gh', status: 'pending', email: 'onboarding+acme@loopkitchen.com', role: 'Admin (NOT Basic)', color: '#e3342f', stores: 127 }
+  },
+  platOrder: ['dd', 'ue', 'gh'],
+  adminName: '',
+  companyName: 'Acme Restaurants'
+};
+
+const $ = s => document.querySelector(s);
+const $$ = s => document.querySelectorAll(s);
+const chat = $('#chat');
+const topSteps = $$('.topbar-step');
+const DELAYS = { short: 400, med: 800, long: 1200, type: 600 };
+
+// ═══════════════════════════════════════════════
+// CHAT ENGINE
+// ═══════════════════════════════════════════════
+function scrollDown() {
+  requestAnimationFrame(() => chat.scrollTop = chat.scrollHeight);
+}
+
+function addMsg(text, type = 'bot') {
+  removeTyping();
+  removeReplies();
+  const d = document.createElement('div');
+  d.className = `msg ${type}`;
+  d.innerHTML = text;
+  chat.appendChild(d);
+  scrollDown();
+  return d;
+}
+
+function addCard(html, cls = '') {
+  removeTyping();
+  const d = document.createElement('div');
+  d.className = `msg bot`;
+  d.innerHTML = `<div class="card ${cls}">${html}</div>`;
+  chat.appendChild(d);
+  scrollDown();
+  return d;
+}
+
+function addSystem(text) {
+  const d = document.createElement('div');
+  d.className = 'msg system';
+  d.textContent = text;
+  chat.appendChild(d);
+  scrollDown();
+}
+
+function showTyping() {
+  removeTyping();
+  const d = document.createElement('div');
+  d.className = 'typing';
+  d.id = 'typingEl';
+  d.innerHTML = '<span></span><span></span><span></span>';
+  chat.appendChild(d);
+  scrollDown();
+}
+
+function removeTyping() {
+  const t = $('#typingEl');
+  if (t) t.remove();
+}
+
+function removeReplies() {
+  $$('.replies').forEach(r => r.remove());
+}
+
+function showReplies(options, callback) {
+  removeReplies();
+  const wrap = document.createElement('div');
+  wrap.className = 'replies';
+  options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = `reply-btn${opt.primary ? ' primary' : ''}`;
+    btn.textContent = opt.label;
+    btn.onclick = () => {
+      addMsg(opt.label, 'user');
+      removeReplies();
+      callback(opt.value || opt.label);
+    };
+    wrap.appendChild(btn);
+  });
+  chat.appendChild(wrap);
+  scrollDown();
+}
+
+function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+async function botSays(text, cardCls) {
+  showTyping();
+  await delay(DELAYS.type);
+  if (cardCls !== undefined) return addCard(text, cardCls);
+  return addMsg(text, 'bot');
+}
+
+// ═══════════════════════════════════════════════
+// PROGRESS
+// ═══════════════════════════════════════════════
+const PHASES = ['welcome', 'overview', 'platform', 'verify', 'done'];
+function updateProgress() {
+  const idx = PHASES.indexOf(S.phase);
+  topSteps.forEach((el, i) => {
+    el.classList.toggle('done', i < idx);
+    el.classList.toggle('active', i === idx);
+  });
+  // Time estimate
+  const times = { welcome: '~12 min', overview: '~10 min', platform: `~${Math.max(2, 8 - S.platIdx * 3)} min`, verify: '~2 min', done: 'Done!' };
+  $('#timeEst').textContent = times[S.phase] || '';
+}
+
+function updatePlatProgress() {
+  const fab = $('#progFab');
+  fab.classList.add('show');
+  let html = '';
+  S.platOrder.forEach(code => {
+    const p = S.platforms[code];
+    const dot = p.status === 'done' ? 'done' : p.status === 'active' ? 'active' : 'pending';
+    const label = p.status === 'done' ? 'Connected' : p.status === 'active' ? 'In Progress' : 'Pending';
+    html += `<div class="progress-item"><div class="progress-dot ${dot}"></div><span>${p.name}</span><span style="color:var(--gray-500);margin-left:auto;font-size:11px">${label}</span></div>`;
+  });
+  $('#progList').innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════
+// FLOW: WELCOME
+// ═══════════════════════════════════════════════
+async function startWelcome() {
+  S.phase = 'welcome';
+  updateProgress();
+
+  await delay(500);
+  await botSays(`Hi there! I'm your Loop onboarding assistant. I'll walk you through connecting your delivery platforms — quick and easy.`);
+  await delay(300);
+  await botSays(`First, what should I call you?`);
+
+  showReplies([
+    { label: 'Just call me Admin', value: 'Admin' },
+    { label: 'Let me type my name', value: '_type_' }
+  ], async (val) => {
+    if (val === '_type_') {
+      $('#userInput').focus();
+      $('#userInput').placeholder = 'Type your name...';
+      waitForNameInput();
+    } else {
+      S.adminName = val;
+      await startOverview();
+    }
+  });
+}
+
+function waitForNameInput() {
+  const handler = () => {
+    const v = $('#userInput').value.trim();
+    if (v) {
+      S.adminName = v;
+      addMsg(v, 'user');
+      $('#userInput').value = '';
+      $('#userInput').placeholder = 'Type a message...';
+      $('#sendBtn').removeEventListener('click', handler);
+      $('#userInput').removeEventListener('keydown', keyHandler);
+      startOverview();
+    }
+  };
+  const keyHandler = (e) => { if (e.key === 'Enter') handler(); };
+  $('#sendBtn').addEventListener('click', handler);
+  $('#userInput').addEventListener('keydown', keyHandler);
+}
+
+// ═══════════════════════════════════════════════
+// FLOW: OVERVIEW
+// ═══════════════════════════════════════════════
+async function startOverview() {
+  S.phase = 'overview';
+  updateProgress();
+
+  await botSays(`Great, ${S.adminName}! Here's what we'll do today:`);
+
+  await botSays(`
+    <div class="card highlight">
+      <div class="card-title">Access Onboarding</div>
+      <div class="card-body">
+        <div class="step-row"><div class="step-num">1</div> Copy Loop's email address</div>
+        <div class="step-row"><div class="step-num">2</div> Add it as a user on each platform</div>
+        <div class="step-row"><div class="step-num">3</div> We verify access automatically</div>
+      </div>
+      <div style="margin-top:10px;font-size:12px;color:var(--gray-500)">3 platforms &middot; ~3 min each &middot; max 3 actions per step</div>
+    </div>
+  `);
+
+  await delay(400);
+  await botSays(`You'll connect <strong>DoorDash</strong>, <strong>Uber Eats</strong>, and <strong>Grubhub</strong>. I'll guide you through each one — no guesswork.`);
+
+  await delay(200);
+  showReplies([
+    { label: "Let's start!", primary: true },
+    { label: 'How long will this take?' },
+    { label: 'Can I do this later?' }
+  ], async (val) => {
+    if (val === 'How long will this take?') {
+      await botSays(`About 10-12 minutes total. Each platform takes ~3 minutes — just copying an email and adding a user. I'll be here the whole time.`);
+      await delay(200);
+      showReplies([{ label: "Got it, let's go!", primary: true }], () => startPlatform());
+    } else if (val === 'Can I do this later?') {
+      await botSays(`Of course! Your progress is saved. When you come back, we'll pick up right where you left off. But if you have 10 minutes now, we can knock it out.`);
+      await delay(200);
+      showReplies([
+        { label: "I have time, let's go!", primary: true },
+        { label: "I'll come back later" }
+      ], async (v2) => {
+        if (v2 === "I'll come back later") {
+          await botSays(`No problem! I'll be here whenever you're ready. Just open this link again.`);
+        } else {
+          startPlatform();
+        }
+      });
+    } else {
+      startPlatform();
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════
+// FLOW: PLATFORM CONNECT
+// ═══════════════════════════════════════════════
+async function startPlatform() {
+  S.phase = 'platform';
+  updateProgress();
+
+  const code = S.platOrder[S.platIdx];
+  const plat = S.platforms[code];
+  plat.status = 'active';
+  S.platStep = 0;
+  updatePlatProgress();
+
+  const num = S.platIdx + 1;
+  const total = S.platOrder.length;
+
+  addSystem(`Platform ${num} of ${total}`);
+
+  await botSays(`
+    <div class="card highlight">
+      <div class="card-title"><span class="plat-pill ${code}">${plat.name}</span> &middot; Platform ${num}/${total}</div>
+      <div class="card-body">
+        <strong>Role needed:</strong> ${plat.role}<br>
+        <strong>Stores:</strong> ${plat.stores} locations<br>
+        <strong>Time:</strong> ~3 min
+      </div>
+    </div>
+  `);
+
+  await delay(300);
+  await platStep1(code);
+}
+
+async function platStep1(code) {
+  const plat = S.platforms[code];
+  S.platStep = 1;
+
+  await botSays(`<strong>Step 1 of 3:</strong> Copy this email address — you'll add it to ${plat.name}.`);
+
+  await botSays(`
+    <div class="copy-field" onclick="copyEmail(this, '${plat.email}')">
+      <div class="copy-field-text">${plat.email}</div>
+      <div class="copy-field-btn">TAP TO COPY</div>
+    </div>
+  `);
+
+  await delay(200);
+  showReplies([
+    { label: 'Copied!', primary: true, value: 'copied' },
+    { label: "What's this email for?" }
+  ], async (val) => {
+    if (val !== 'copied') {
+      await botSays(`This is Loop's service account. By adding it as a user on ${plat.name}, Loop gets read-only access to your store data — orders, reviews, and performance metrics. We never make changes to your account.`);
+      await delay(200);
+      showReplies([{ label: 'Got it, copied!', primary: true }], () => platStep2(code));
+    } else {
+      platStep2(code);
+    }
+  });
+}
+
+async function platStep2(code) {
+  const plat = S.platforms[code];
+  S.platStep = 2;
+
+  const instructions = {
+    dd: {
+      steps: [
+        'Open <strong>DoorDash Merchant Portal</strong>',
+        'Go to <strong>Settings &rarr; Users</strong>',
+        'Click <strong>Add User</strong>, paste the email, select <strong>Business Admin</strong> role'
+      ],
+      warning: null,
+      portal: 'merchant.doordash.com'
+    },
+    ue: {
+      steps: [
+        'Open <strong>Uber Eats Manager</strong>',
+        'Go to <strong>Users &rarr; Invite</strong>',
+        'Paste the email, select <strong>Full Access</strong> role'
+      ],
+      warning: null,
+      portal: 'restaurant.uber.com'
+    },
+    gh: {
+      steps: [
+        'Open <strong>Grubhub for Restaurants</strong>',
+        'Go to <strong>Account &rarr; Team Members</strong>',
+        'Paste the email, select <strong>Admin</strong> role'
+      ],
+      warning: 'Important: Choose <strong>Admin</strong> — NOT Basic. Basic doesn\'t provide the access Loop needs.',
+      portal: 'restaurant.grubhub.com'
+    }
+  };
+
+  const inst = instructions[code];
+
+  await botSays(`<strong>Step 2 of 3:</strong> Add Loop as a user on ${plat.name}.`);
+
+  let cardHtml = `<div class="card-body">`;
+  inst.steps.forEach((s, i) => {
+    cardHtml += `<div class="step-row"><div class="step-num">${i + 1}</div><span>${s}</span></div>`;
+  });
+  cardHtml += `</div>`;
+
+  if (inst.warning) {
+    cardHtml += `<div style="margin-top:10px;padding:8px 12px;background:var(--amber-bg);border-radius:6px;font-size:12px;color:#92400e">${inst.warning}</div>`;
+  }
+
+  await botSays(cardHtml, 'highlight');
+
+  await delay(300);
+  await botSays(`Once you've added the email with <strong>${plat.role}</strong> role, let me know and I'll verify the connection.`);
+
+  await delay(200);
+  showReplies([
+    { label: "Done, verify now!", primary: true, value: 'verify' },
+    { label: "I need help", value: 'help' },
+    { label: "I'll do this one later", value: 'skip' }
+  ], async (val) => {
+    if (val === 'help') {
+      await showPlatHelp(code);
+    } else if (val === 'skip') {
+      await skipPlatform(code);
+    } else {
+      platStep3(code);
+    }
+  });
+}
+
+async function showPlatHelp(code) {
+  const plat = S.platforms[code];
+  const helpMap = {
+    dd: `Here's exactly where to find it:\n\n1. Log in at <strong>merchant.doordash.com</strong>\n2. Click the <strong>gear icon</strong> (top right)\n3. Select <strong>Users</strong> from the dropdown\n4. Hit the <strong>+ Add User</strong> button\n\nIf you don't see "Users" in Settings, you may not have admin permissions. Ask your account owner to add Loop instead.`,
+    ue: `Here's the path:\n\n1. Log in at <strong>restaurant.uber.com</strong>\n2. Click <strong>Users</strong> in the left sidebar\n3. Click <strong>Invite User</strong>\n4. Enter the email and select <strong>Full Access</strong>\n\nIf you can't find Users, make sure you're on the main restaurant dashboard, not a single-store view.`,
+    gh: `Here's where to go:\n\n1. Log in at <strong>restaurant.grubhub.com</strong>\n2. Click your name (top right) &rarr; <strong>Account</strong>\n3. Scroll to <strong>Team Members</strong>\n4. Click <strong>Add Member</strong>\n\nRemember: select <strong>Admin</strong>, not Basic!`
+  };
+
+  await botSays(helpMap[code]);
+  await delay(300);
+  showReplies([
+    { label: "Done, verify now!", primary: true, value: 'verify' },
+    { label: "Still stuck — I'll do this later", value: 'skip' }
+  ], async (val) => {
+    if (val === 'skip') {
+      await skipPlatform(code);
+    } else {
+      platStep3(code);
+    }
+  });
+}
+
+async function skipPlatform(code) {
+  const plat = S.platforms[code];
+  plat.status = 'pending';
+  updatePlatProgress();
+  await botSays(`No worries — I've saved ${plat.name} for later. You can come back anytime to finish it. Let's move on.`);
+  await delay(400);
+  nextPlatform();
+}
+
+async function platStep3(code) {
+  const plat = S.platforms[code];
+  S.platStep = 3;
+
+  await botSays(`<strong>Step 3 of 3:</strong> Verifying ${plat.name} connection...`);
+
+  // Simulated verification
+  await botSays(`
+    <div class="card highlight">
+      <div class="card-body">
+        <ul class="checklist" id="checklist-${code}">
+          <li><span class="check-icon running"><span class="spinner" style="width:12px;height:12px;border-width:1.5px"></span></span> Checking user access...</li>
+          <li><span class="check-icon pending">&#8226;</span> Validating role permissions</li>
+          <li><span class="check-icon pending">&#8226;</span> Confirming store coverage</li>
+        </ul>
+      </div>
+    </div>
+  `, 'highlight');
+
+  await delay(1200);
+
+  // Simulate random outcome (mostly success for demo)
+  const outcome = simulateVerification(code);
+
+  const checklistEl = $(`#checklist-${code}`);
+  if (checklistEl) {
+    if (outcome === 'success') {
+      checklistEl.innerHTML = `
+        <li><span class="check-icon done">&#10003;</span> User access confirmed</li>
+        <li><span class="check-icon done">&#10003;</span> ${plat.role} role verified</li>
+        <li><span class="check-icon done">&#10003;</span> ${plat.stores} stores connected</li>
+      `;
+      checklistEl.closest('.card').className = 'card success';
+    } else if (outcome === 'role_error') {
+      checklistEl.innerHTML = `
+        <li><span class="check-icon done">&#10003;</span> User access confirmed</li>
+        <li><span class="check-icon" style="background:var(--red);color:#fff">&#10007;</span> Wrong role detected (Basic instead of ${plat.role})</li>
+        <li><span class="check-icon pending">&#8226;</span> Store coverage not checked</li>
+      `;
+      checklistEl.closest('.card').className = 'card error';
+    } else if (outcome === 'not_found') {
+      checklistEl.innerHTML = `
+        <li><span class="check-icon" style="background:var(--red);color:#fff">&#10007;</span> User not found on ${plat.name}</li>
+        <li><span class="check-icon pending">&#8226;</span> Role not checked</li>
+        <li><span class="check-icon pending">&#8226;</span> Store coverage not checked</li>
+      `;
+      checklistEl.closest('.card').className = 'card error';
+    }
+  }
+
+  scrollDown();
+  await delay(500);
+
+  if (outcome === 'success') {
+    plat.status = 'done';
+    updatePlatProgress();
+    await botSays(`${plat.name} is connected and verified! ${plat.stores} stores are now linked.`);
+    await delay(200);
+    const remaining = S.platOrder.filter(c => S.platforms[c].status !== 'done').length;
+    if (remaining > 0) {
+      showReplies([
+        { label: `Next platform`, primary: true, value: 'next' }
+      ], () => nextPlatform());
+    } else {
+      showReplies([
+        { label: 'Finish setup', primary: true }
+      ], () => finishAll());
+    }
+  } else {
+    await handleVerifyError(code, outcome);
+  }
+}
+
+function simulateVerification(code) {
+  // For demo: dd always succeeds, ue may have role error first time, gh succeeds
+  if (code === 'ue' && !S._ueRetried) return 'role_error';
+  return 'success';
+}
+
+async function handleVerifyError(code, outcome) {
+  const plat = S.platforms[code];
+
+  if (outcome === 'role_error') {
+    await botSays(`
+      <div class="card warning">
+        <div class="card-title">Action needed</div>
+        <div class="card-body">
+          It looks like the role is set to <strong>Basic</strong> instead of <strong>${plat.role}</strong>. Here's how to fix it:
+          <div class="step-row"><div class="step-num">1</div><span>Go back to ${plat.name} &rarr; Users</span></div>
+          <div class="step-row"><div class="step-num">2</div><span>Find <strong>${plat.email}</strong></span></div>
+          <div class="step-row"><div class="step-num">3</div><span>Change role to <strong>${plat.role}</strong></span></div>
+        </div>
+      </div>
+    `);
+    await delay(200);
+    await botSays(`<strong>Next step:</strong> Once you update the role, I'll re-verify and we'll be good to go.`);
+  } else {
+    await botSays(`
+      <div class="card warning">
+        <div class="card-title">User not found</div>
+        <div class="card-body">
+          I couldn't find the Loop account on ${plat.name} yet. This usually means:
+          <div style="margin-top:6px">
+            &bull; The invite hasn't been processed yet (can take 1-2 min)<br>
+            &bull; The email was entered with a typo
+          </div>
+          <div style="margin-top:8px">Double-check the email and try again.</div>
+        </div>
+      </div>
+    `);
+    await delay(200);
+    await botSays(`<strong>Next step:</strong> Verify the email on ${plat.name}, then tap "Re-verify" below.`);
+  }
+
+  showReplies([
+    { label: 'Re-verify', primary: true, value: 'retry' },
+    { label: "Skip for now", value: 'skip' }
+  ], async (val) => {
+    if (val === 'skip') {
+      await skipPlatform(code);
+    } else {
+      S[`_${code}Retried`] = true;
+      await platStep3(code);
+    }
+  });
+}
+
+function nextPlatform() {
+  S.platIdx++;
+  if (S.platIdx < S.platOrder.length) {
+    startPlatform();
+  } else {
+    finishAll();
+  }
+}
+
+// ═══════════════════════════════════════════════
+// FLOW: FINISH
+// ═══════════════════════════════════════════════
+async function finishAll() {
+  S.phase = 'done';
+  updateProgress();
+  $('#progFab').classList.remove('show');
+
+  const done = S.platOrder.filter(c => S.platforms[c].status === 'done');
+  const skipped = S.platOrder.filter(c => S.platforms[c].status !== 'done');
+
+  addSystem('Onboarding Complete');
+
+  let summaryHtml = `<div class="card-title">Summary</div><div class="card-body">`;
+  S.platOrder.forEach(code => {
+    const p = S.platforms[code];
+    const icon = p.status === 'done' ? `<span style="color:var(--green)">&#10003;</span>` : `<span style="color:var(--amber)">&#9679;</span>`;
+    const label = p.status === 'done' ? `Connected &middot; ${p.stores} stores` : 'Pending — come back to finish';
+    summaryHtml += `<div style="display:flex;align-items:center;gap:8px;padding:5px 0"><span class="plat-pill ${code}">${p.name}</span>${icon} <span style="font-size:12px;color:var(--gray-500)">${label}</span></div>`;
+  });
+  summaryHtml += `</div>`;
+
+  await botSays(summaryHtml, 'success');
+
+  if (skipped.length > 0) {
+    await delay(300);
+    await botSays(`${skipped.length} platform${skipped.length > 1 ? 's' : ''} still need${skipped.length === 1 ? 's' : ''} setup. You'll get a reminder, or you can come back anytime.`);
+  }
+
+  await delay(400);
+  await botSays(`<strong>What's next:</strong> Our team will run a QC check on your connections. After that, your CS manager will reach out for kick-off. No action needed from you right now.`);
+
+  await delay(300);
+  await botSays(`
+    <div class="card highlight">
+      <div class="card-title">Coming soon</div>
+      <div class="card-body">
+        After access is live, you'll unlock self-serve setup for:
+        <div style="margin-top:6px">
+          <div class="step-row"><div class="step-num" style="background:var(--navy)">1</div><span><strong>Agents</strong> — AI-powered store management</span></div>
+          <div class="step-row"><div class="step-num" style="background:var(--navy)">2</div><span><strong>Marketing</strong> — Campaign & promo tools</span></div>
+          <div class="step-row"><div class="step-num" style="background:var(--navy)">3</div><span><strong>Finance</strong> — Billing & reconciliation</span></div>
+          <div class="step-row"><div class="step-num" style="background:var(--navy)">4</div><span><strong>Protect</strong> — Dispute & chargeback management</span></div>
+        </div>
+      </div>
+    </div>
+  `);
+
+  await delay(300);
+  showReplies([
+    { label: 'Sounds great!', primary: true },
+    { label: 'I have a question' }
+  ], async (val) => {
+    if (val === 'I have a question') {
+      await botSays(`Sure! Type your question below and I'll do my best to help. You can also reach your CS manager once kick-off begins.`);
+      enableFreeChat();
+    } else {
+      $('#celebration').classList.add('show');
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════
+// FREE CHAT (fallback for questions)
+// ═══════════════════════════════════════════════
+function enableFreeChat() {
+  const handler = async () => {
+    const v = $('#userInput').value.trim();
+    if (!v) return;
+    addMsg(v, 'user');
+    $('#userInput').value = '';
+
+    const lower = v.toLowerCase();
+    if (lower.includes('how long') || lower.includes('time')) {
+      await botSays(`QC usually takes 1-2 business days. Your CS manager will reach out within a few days after that.`);
+    } else if (lower.includes('store') || lower.includes('location') || lower.includes('missing')) {
+      await botSays(`If you're seeing fewer stores than expected, it's usually because some locations aren't linked to the admin account. Your CS manager can help reconcile store lists during kick-off.`);
+    } else if (lower.includes('role') || lower.includes('permission') || lower.includes('access')) {
+      await botSays(`Loop needs admin-level access to pull data across all your stores. Read-only is fine — we never make changes to your delivery accounts.`);
+    } else if (lower.includes('billing') || lower.includes('invoice') || lower.includes('payment')) {
+      await botSays(`Billing setup is handled separately by your contract signee or CFO. They'll receive a link to complete that through our billing partner, Zenskar.`);
+    } else {
+      await botSays(`Good question! I'll flag this for your CS manager to address during kick-off. Is there anything else?`);
+    }
+
+    showReplies([
+      { label: "That's all, thanks!", primary: true },
+      { label: 'Another question' }
+    ], async (val) => {
+      if (val === 'Another question') {
+        await botSays(`Go ahead — type your question below.`);
+        enableFreeChat();
+      } else {
+        $('#celebration').classList.add('show');
+      }
+    });
+  };
+
+  $('#sendBtn').onclick = handler;
+  $('#userInput').onkeydown = (e) => { if (e.key === 'Enter') handler(); };
+}
+
+// ═══════════════════════════════════════════════
+// UTILITIES
+// ═══════════════════════════════════════════════
+function copyEmail(el, email) {
+  navigator.clipboard.writeText(email).then(() => {
+    el.querySelector('.copy-field-btn').textContent = 'COPIED!';
+    el.style.borderColor = 'var(--green)';
+    setTimeout(() => {
+      el.querySelector('.copy-field-btn').textContent = 'TAP TO COPY';
+      el.style.borderColor = '';
+    }, 2000);
+  }).catch(() => {
+    // Fallback: select text
+    const range = document.createRange();
+    range.selectNode(el.querySelector('.copy-field-text'));
+    window.getSelection().removeAllRanges();
+    window.getSelection().addRange(range);
+  });
+}
+
+// ═══════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════
+startWelcome();
+</script>
+</body>
+</html>
